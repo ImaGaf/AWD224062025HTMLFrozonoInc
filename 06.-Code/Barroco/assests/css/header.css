@@ -1,0 +1,82 @@
+body {
+    font-family: 'Didact Gothic', sans-serif;
+}
+
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+h1{
+    color: white;
+    font-weight: 200;
+    letter-spacing: 4px;
+}
+
+.barroco-header {
+    background-color: #c8d5b9;
+    padding: 18px 40px;
+    font-family: 'Arial', sans-serif;
+    height: 135px;
+}
+
+.header-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.logo{
+    width: 100px;
+}
+
+.logo-icon {
+    font-size: 32px;
+    color: #f78f1e;
+    margin-right: 8px;
+}
+
+.logo-text {
+    font-weight: bold;
+    color: #f78f1e;
+    font-size: 18px;
+    letter-spacing: 1px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 35px;
+    margin-top: 0px;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding-top: 5px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    font-size: 18px;
+    transition: color 0.3s;
+    color: white;
+    font-weight: 100;
+}
+
+.nav-links a:hover {
+    color: #f78f1e;
+}
+
+.icon-links {
+    display: flex;
+    gap: 22px;
+}
+
+.icon-links a {
+    color: white;
+    font-size: 25px;
+    transition: color 0.3s;
+}
+
+.icon-links a:hover {
+    color: #f78f1e;
+}
