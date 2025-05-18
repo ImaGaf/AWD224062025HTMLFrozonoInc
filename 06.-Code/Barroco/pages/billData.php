@@ -10,7 +10,7 @@
 <?php include '../components/header.php'; ?>
 
 <main>
-    <h2>Bill data</h2>
+    <h2>Bill data hola</h2>
 </main>
 
 </body>
