@@ -26,7 +26,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $stmt->bind_param("ssss", $firstName, $lastName, $email, $passwordHash);
 
     if ($stmt->execute()) {
-        $_SESSION["idUser"] = $stmt->insert_id;
+        $idUser = $stmt->insert_id;
+
+        // ✅ Insertar en la tabla customer
+        $conn->query("INSERT INTO customer (idCustomer) VALUES ($idUser)");
+
+        // Guardar sesión
+        $_SESSION["idUser"] = $idUser;
         $_SESSION["email"] = $email;
         $_SESSION["usuario"] = $usuario;
 

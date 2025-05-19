@@ -10,7 +10,7 @@
     <div class="contenedor">
         <div class="formulario">
             <h2>BIENVENIDO</h2>
-            <form action="" method="post">
+            <form action="../server/login.php" method="post">
                 <label for="usuario">Usuario</label>
                 <input type="text" id="usuario" name="usuario" placeholder="Usuario" required>
 
