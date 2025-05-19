@@ -34,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit;
     } else {
         if ($conn->errno === 1062) {
-            echo "<script>alert('Este correo ya está registrado.'); window.history.back();</script>";
+            echo "<script>alert('Este correo ya está registrado en la tienda.'); window.history.back();</script>";
         } else {
             echo "<script>alert('Error al registrar: " . $conn->error . "'); window.history.back();</script>";
         }
