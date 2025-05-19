@@ -1,33 +1,28 @@
-
-
-
-
-
 .cart-container {
     background-color: #fefbe8;
     padding: 20px;
     border-radius: 10px;
-
     width: 100%;
-    max-width: 100%; 
-    box-sizing: border-box; 
+    max-width: 100%;
+    box-sizing: border-box;
 }
-
 
 .cart-item {
     display: flex;
     align-items: center;
     gap: 15px;
     margin-bottom: 20px;
-    border-bottom: 1px solid black; 
-    padding-bottom: 15px;   
+    border-bottom: 1px solid black;
+    padding-bottom: 15px;
+    flex-wrap: wrap;
 }
 
 .cart-img {
-    width: 100px;  
+    width: 100px;
     height: 100px;
     object-fit: cover;
     border-radius: 8px;
+    flex-shrink: 0;
 }
 
 .cart-info {
@@ -36,32 +31,33 @@
     gap: 10px;
     font-size: 1.1rem;
     padding-right: 10px;
-    width: 100px;
-    height: 100px;
     flex-grow: 1;
+    min-width: 200px;
 }
-
 
 .cart-quantity {
     display: flex;
     align-items: center;
     gap: 10px;
+    flex-wrap: nowrap;
 }
 
 .cart-quantity button {
     background-color: #444;
     color: white;
-    padding: 10px 15px; 
-    font-size: 1.2rem;   
+    padding: 10px 15px;
+    font-size: 1.2rem;
     border: none;
     border-radius: 5px;
     cursor: pointer;
 }
+
 .cart-item input[type="checkbox"] {
     width: 24px;
     height: 24px;
     cursor: pointer;
 }
+
 .cart-footer {
     display: flex;
     justify-content: flex-end;
@@ -71,11 +67,12 @@
     padding: 40px 30px;
     border-radius: 12px;
     margin-top: 30px;
-    font-size: 1.3rem; 
+    font-size: 1.3rem;
+    flex-wrap: wrap;
 }
 
 .pay-btn {
-     background-color: #de9d67;
+    background-color: #de9d67;
     color: white;
     padding: 14px 28px;
     border: none;
@@ -84,6 +81,7 @@
     font-weight: bold;
     cursor: pointer;
 }
+
 .hero-banner {
     position: relative;
     width: 100%;
@@ -126,15 +124,68 @@
     background-image: url(../imgs/heroCart.png);
     background-size: cover;
     background-position: center;
-    padding: 80px 40px;   
+    padding: 80px 40px;
     text-align: center;
     color: white;
-    font-size: 2.5em;    
+    font-size: 2.5em;
     font-weight: bold;
     border-bottom: 2px solid #ccc;
-    box-sizing: border-box; 
-    border-radius: 12px;    
-    
-    margin: 0 auto;        
-    min-height: 350px;     
+    box-sizing: border-box;
+    border-radius: 12px;
+    margin: 0 auto;
+    min-height: 350px;
+}
+
+/* RESPONSIVE DESIGN */
+
+@media (max-width: 768px) {
+    .cart-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .cart-info {
+        width: 100%;
+    }
+
+    .cart-quantity {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .cart-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+    }
+
+    .hero-text h1 {
+        font-size: 1.8rem;
+    }
+
+    .hero-text p {
+        font-size: 1rem;
+    }
+
+    .cart-hero {
+        font-size: 1.8em;
+        padding: 60px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .cart-img {
+        width: 80px;
+        height: 80px;
+    }
+
+    .cart-quantity button {
+        padding: 8px 12px;
+        font-size: 1rem;
+    }
+
+    .pay-btn {
+        width: 100%;
+        text-align: center;
+    }
 }
