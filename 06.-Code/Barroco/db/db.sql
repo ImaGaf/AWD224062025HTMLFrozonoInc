@@ -6,7 +6,9 @@ CREATE SCHEMA IF NOT EXISTS `barroco`
   DEFAULT CHARACTER SET utf8mb4
   COLLATE utf8mb4_general_ci;
 
+
 USE `barroco`;
+
 
 CREATE TABLE IF NOT EXISTS `user` (
   `idUser` INT(11) NOT NULL AUTO_INCREMENT,
