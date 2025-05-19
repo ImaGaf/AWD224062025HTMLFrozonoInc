@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Login</title>
     <link rel="stylesheet" href="../assests/css/loginPage.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
     <div class="contenedor">
@@ -13,20 +14,21 @@
                 <label for="usuario">Usuario</label>
                 <input type="text" id="usuario" name="usuario" placeholder="Usuario" required>
 
-                <label for="contrasena">Contraseña</label>
-                <input type="password" id="contrasena" name="contrasena" placeholder="Contraseña" required>
+                <label for="password">Contraseña</label>
+                <input type="password" id="password" name="password" placeholder="Contraseña" required>
 
                 <button type="submit">ENTRAR</button>
             </form>
-
             <div class="google-login">
-                <span>o</span>
+                <p class="separador">O ingresa con</p>
                 <div class="google-icon">G</div>
             </div>
-
-            <p class="registro">¿No tienes una cuenta? <a href="register.php">Regístrate</a></p>
+            <p class="registro">¿No tienes una cuenta? <a href="">Regístrate</a></p>
         </div>
-        <div class="imagen"></div>
+
+        <div class="imagen">
+            <img src="../assests/imgs/backLogin.jpg" alt="Decoración" />
+        </div>
     </div>
 </body>
 </html>

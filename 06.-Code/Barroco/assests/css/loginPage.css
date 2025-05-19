@@ -1,23 +1,33 @@
-body {
+* {
+    box-sizing: border-box;
     margin: 0;
-    font-family: 'Arial', sans-serif;
-    background-color: #c2d4b3;
+    padding: 0;
 }
 
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #b0c69eef;
+}
+
+
 .contenedor {
+    position: relative;
     display: flex;
     height: 100vh;
+    overflow: hidden;
 }
 
 .formulario {
+    position: relative;
+    z-index: 2;
     width: 50%;
-    background-color: #c2d4b3;
+    background-color: rgba(176, 198, 158, 0.634);
     display: flex;
     flex-direction: column;
     justify-content: center;
     padding: 40px;
+    backdrop-filter: blur(4px);
 }
-
 .formulario h2 {
     font-size: 32px;
     font-weight: bold;
@@ -34,50 +44,126 @@ input[type="text"],
 input[type="password"] {
     width: 100%;
     padding: 12px;
-    margin-bottom: 10px;
-    border: none;
-    border-radius: 6px;
+    margin-bottom: 15px;
+    border: 2px solid #d2a573;
+    border-radius: 8px;
+    background-color: #f5f5f5;
     font-size: 16px;
+    color: #3b3b3b;
+    transition: border-color 0.3s, box-shadow 0.3s;
 }
 
+input[type="text"]:focus,
+input[type="password"]:focus {
+    outline: none;
+    border-color: #b98452;
+    box-shadow: 0 0 6px rgba(210, 165, 115, 0.5);
+}
+
+
 button {
-    background-color: #d2a573;
-    color: black;
+    background: linear-gradient(135deg, #d2a573, #b98452);
+    color: rgb(0, 0, 0);
     font-weight: bold;
-    border: none;
+    font-size: 16px;
     padding: 14px;
     width: 100%;
-    border-radius: 6px;
+    border: none;
+    border-radius: 8px;
     margin-top: 10px;
-    box-shadow: 0 4px 4px rgba(0,0,0,0.2);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
     cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 button:hover {
-    background-color: #c89558;
+    background: linear-gradient(135deg, #c48a5a, #a76d40);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
+
 
 .google-login {
     text-align: center;
-    margin: 20px 0;
+    margin: 30px 0;
 }
 
-.google-login .google-icon {
-    font-size: 32px;
+.separador {
+    font-size: 14px;
+    color: #6b4c3b;
+    margin-bottom: 10px;
+}
+
+.google-icon {
+    font-size: 36px;
+    background-color: black;
+    color: #a76d40;
     font-weight: bold;
+    width: 48px;
+    height: 48px;
+    line-height: 48px;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s;
+    cursor: pointer;
+}
+
+.google-icon:hover {
+    transform: scale(1.1);
 }
 
 .registro {
-    font-size: 14px;
+    font-size: 15px;
+    color: #3b3b3b;
+    text-align: center;
+    margin-top: 20px;
 }
 
 .registro a {
-    color: #d2a573;
-    text-decoration: none;
+    color: #c89a65;
+    font-weight: bold;
+    text-decoration: underline;
+    transition: color 0.3s, text-shadow 0.3s;
+}
+
+.registro a:hover {
+    color: #a76d40;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .imagen {
     width: 50%;
-    background: url('../assests/imgs/backLogin.png') no-repeat center center;
-    background-size: cover;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.imagen img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+@media (max-width: 768px) {
+    .contenedor {
+        flex-direction: column;
+    }
+
+    .formulario {
+        width: 100%;
+        padding: 20px;
+        min-height: 100vh;
+    }
+
+    .imagen {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+    }
+
+    .imagen img {
+        object-fit: cover;
+        opacity: 0.4;
+    }
 }
