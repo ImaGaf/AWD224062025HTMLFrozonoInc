@@ -1,0 +1,150 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Didact Gothic', sans-serif;
+    background-color: rgb(150, 170, 134);
+}
+
+.main-payment {
+    margin: 0 auto;
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+.resumen {
+    background-color: #dce7d4;
+    padding: 30px;
+    border-radius: 12px;
+    width: 420px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+.resumen h2 {
+    font-size: 26px;
+    color: #2b2b2b;
+    margin-bottom: 10px;
+}
+
+.resumen p {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 15px;
+}
+
+.resumen .orden {
+    font-size: 14px;
+    color: #666;
+    margin-top: 10px;
+}
+
+.boton-volver {
+    margin-top: 20px;
+    background-color: #c48a5a;
+    color: white;
+    font-weight: bold;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s;
+    width: 100%;
+}
+
+.boton-volver:hover {
+    background-color: #a76d40;
+}
+
+.formulario-pago {
+    background-color: white;
+    padding: 30px;
+    border-radius: 12px;
+    width: 420px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.apple-pay {
+    display: flex;
+    align-items: center;
+    width: fit-content;
+    justify-content: center;
+    gap: 8px;
+    background-color: #000;
+    color: white;
+    padding: 14px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.apple-pay i {
+    font-size: 18px;
+}
+
+
+.separator {
+    text-align: center;
+    color: #aaa;
+    margin: 10px 0 20px;
+}
+
+form label {
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    color: #333;
+    font-weight: 500;
+}
+
+form input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.tarjeta-flex {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.tarjeta-flex input {
+    flex: 1;
+}
+
+.pagar {
+    background-color: #c48a5a;
+    color: white;
+    font-weight: bold;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    width: 100%;
+    margin-top: 20px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.pagar:hover {
+    background-color: #a76d40;
+}
+
+@media (max-width: 900px) {
+    .main-payment {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .resumen, .formulario-pago {
+        width: 90%;
+    }
+}
