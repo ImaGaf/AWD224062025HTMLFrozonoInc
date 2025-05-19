@@ -12,7 +12,7 @@
             <h2>CREAR CUENTA</h2>
 
             <div class="form-content">
-                <form action="register.php" method="post">
+                <form action="../server/registerUser.php" method="post">
                     <label for="email">Correo electrónico</label>
                     <input type="email" id="email" name="email" placeholder="ejemplo@correo.com" required>
 
