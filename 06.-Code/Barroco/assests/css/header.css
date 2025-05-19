@@ -19,8 +19,7 @@ h1{
     background-color: #c8d5b9;
     padding: 18px 40px;
     font-family: 'Arial', sans-serif;
-    height: 135px;
-    position: fixed;
+    overflow: hidden;
 }
 
 .header-container {
@@ -81,4 +80,35 @@ h1{
 
 .icon-links a:hover {
     color: #f78f1e;
+}
+
+@media screen and (max-width: 768px) {
+    .header-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .nav-links {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        padding-top: 10px;
+        width: 100%;
+    }
+}
+
+
+@media screen and (max-width: 480px) {
+    .header-container h1 {
+        font-size: 18px;
+    }
+
+    .nav-links a {
+        font-size: 14px;
+    }
+
+    .icon-links a {
+        font-size: 20px;
+    }
 }
