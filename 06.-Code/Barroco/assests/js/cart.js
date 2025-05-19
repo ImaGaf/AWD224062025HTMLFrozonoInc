@@ -76,3 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
+
+document.getElementById("pay-button").addEventListener("click", () => {
+    window.location.href = "../pages/payment.php";
+});

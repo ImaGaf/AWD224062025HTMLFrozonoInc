@@ -63,6 +63,10 @@ header{
     cursor: pointer;
 }
 
+.cart-quantity button:hover{
+    transform: scale(1.03);
+}
+
 .cart-item input[type="checkbox"] {
     width: 24px;
     height: 24px;
@@ -91,6 +95,10 @@ header{
     font-size: 1.2rem;
     font-weight: bold;
     cursor: pointer;
+}
+
+.pay-btn:hover{
+    transform: scale(1.03);
 }
 
 .hero-banner {

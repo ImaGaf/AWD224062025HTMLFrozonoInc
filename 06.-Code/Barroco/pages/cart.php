@@ -21,7 +21,7 @@
             <div id="cart-items"></div>
 
             <div class="cart-footer">
-                <button class="pay-btn">Pagar</button>
+                <button class="pay-btn" id="pay-button">Pagar</button>
                 <p id="total-price"><strong>Total: 0$</strong></p>
             </div>
         </div>
