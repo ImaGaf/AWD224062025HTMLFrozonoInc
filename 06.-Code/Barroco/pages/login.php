@@ -10,7 +10,7 @@
     <div class="contenedor">
         <div class="formulario">
             <h2>BIENVENIDO</h2>
-            <form action="login.php" method="post">
+            <form action="" method="post">
                 <label for="usuario">Usuario</label>
                 <input type="text" id="usuario" name="usuario" placeholder="Usuario" required>
 
@@ -23,7 +23,7 @@
                 <p class="separador">O ingresa con</p>
                 <div class="google-icon">G</div>
             </div>
-            <p class="registro">¿No tienes una cuenta? <a href="">Regístrate</a></p>
+            <p class="registro">¿No tienes una cuenta? <a href="../pages/register.php">Regístrate</a></p>
         </div>
 
         <div class="imagen">
