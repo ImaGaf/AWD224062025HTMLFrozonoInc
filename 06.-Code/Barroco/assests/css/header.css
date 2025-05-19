@@ -1,5 +1,6 @@
 body {
     font-family: 'Didact Gothic', sans-serif;
+    position: relative;
 }
 
 *{
@@ -19,6 +20,7 @@ h1{
     padding: 18px 40px;
     font-family: 'Arial', sans-serif;
     height: 135px;
+    position: fixed;
 }
 
 .header-container {

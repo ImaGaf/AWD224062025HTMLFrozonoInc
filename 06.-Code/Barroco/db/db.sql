@@ -8,11 +8,11 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,N
 -- -----------------------------------------------------
 -- Schema tu_huella_ceramica
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `tu_huella_ceramica`
+CREATE SCHEMA IF NOT EXISTS `barroco`
   DEFAULT CHARACTER SET utf8mb4
   COLLATE utf8mb4_general_ci;
 
-USE `tu_huella_ceramica`;
+USE `barroco`;
 
 -- -----------------------------------------------------
 -- Table `user`
@@ -119,7 +119,7 @@ CREATE TABLE IF NOT EXISTS `product` (
   `price` DECIMAL(10,2) NULL,
   `stock` INT(11) NULL,
   `category` INT(11) NULL,
-  `isCustom` TINYINT(1) NULL,
+  `url` VARCHAR(200) NULL,
   PRIMARY KEY (`idProduct`),
   INDEX (`category`),
   FOREIGN KEY (`category`) REFERENCES `category` (`idCategory`)
