@@ -1,179 +1,190 @@
-/* Base - escritorio */
-html, body {
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  font-family: 'Arial', sans-serif;
-  background-color: #c2d4b3;
-  overflow: hidden;
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-* {
-  box-sizing: border-box;
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #b0c69eef;
 }
 
 .contenedor {
-  display: flex;
-  height: 100vh;
-  width: 100vw;
-}
-
-.imagen {
-  width: 50%;
-  height: 100vh;
-  background: url('../imgs/backLogin.png') no-repeat center center;
-  background-size: cover;
+    position: relative;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+    flex-direction: row;
 }
 
 .formulario {
-  width: 50%;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  padding: 225px;
+    position: relative;
+    z-index: 2;
+    width: 50%;
+    background-color: rgba(176, 198, 158, 0.634);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 40px;
+    backdrop-filter: blur(4px);
 }
 
-.form-content {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  justify-content: space-between;
-}
-
-.form-box {
-  width: 100%;
-  max-width: 400px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-h2 {
-  font-size: 36px;
-  font-weight: bold;
-  margin-bottom: 30px;
-  text-align: center;
-}
-
-form {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
+.formulario h2 {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
 }
 
 label {
-  font-size: 18px;
-  margin-top: 20px;
-  margin-bottom: 8px;
+    font-size: 1rem;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    display: block;
 }
 
+input[type="email"],
 input[type="text"],
-input[type="password"],
-input[type="email"] {
-  width: 100%;
-  padding: 27px;
-  margin-bottom: 12px;
-  border: none;
-  border-radius: 6px;
-  font-size: 18px;
+input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 2px solid #d2a573;
+    border-radius: 8px;
+    background-color: #f5f5f5;
+    font-size: 16px;
+    color: #3b3b3b;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+input[type="email"]:focus,
+input[type="text"]:focus,
+input[type="password"]:focus {
+    outline: none;
+    border-color: #b98452;
+    box-shadow: 0 0 6px rgba(210, 165, 115, 0.5);
 }
 
 button {
-  background-color: #d2a573;
-  color: black;
-  font-weight: bold;
-  font-size: 18px;
-  border: none;
-  padding: 28px;
-  width: 100%;
-  border-radius: 6px;
-  margin-top: 16px;
-  box-shadow: 0 4px 4px rgba(0,0,0,0.2);
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+    background: linear-gradient(135deg, #d2a573, #b98452);
+    color: rgb(0, 0, 0);
+    font-weight: bold;
+    font-size: 16px;
+    padding: 14px;
+    width: 100%;
+    border: none;
+    border-radius: 8px;
+    margin-top: 10px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 button:hover {
-  background-color: #c89558;
+    background: linear-gradient(135deg, #c48a5a, #a76d40);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
 .google-login {
-  text-align: center;
-  margin: 24px 0;
-  font-size: 18px;
+    text-align: center;
+    margin: 30px 0;
 }
 
-.google-login .google-icon {
-  font-size: 36px;
-  font-weight: bold;
-  margin-top: 10px;
+.google-login span {
+    font-size: 14px;
+    color: #6b4c3b;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.google-icon {
+    font-size: 36px;
+    background-color: black;
+    color: #a76d40;
+    font-weight: bold;
+    width: 48px;
+    height: 48px;
+    line-height: 48px;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s;
+    cursor: pointer;
+}
+
+.google-icon:hover {
+    transform: scale(1.1);
 }
 
 .registro {
-  font-size: 16px;
-  text-align: center;
+    font-size: 15px;
+    color: #3b3b3b;
+    text-align: center;
+    margin-top: 20px;
 }
 
 .registro a {
-  color: #d2a573;
-  text-decoration: none;
+    color: #c89a65;
+    font-weight: bold;
+    text-decoration: underline;
+    transition: color 0.3s, text-shadow 0.3s;
 }
 
-/* Responsive: ocultar imagen y expandir formulario */
-@media (max-width: 768px) {
-  .contenedor {
-    flex-direction: column;
-  }
+.registro a:hover {
+    color: #a76d40;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
 
-  .imagen {
-    display: none;
-  }
-
-  .formulario {
-    width: 100%;
+.imagen {
+    width: 50%;
     height: 100vh;
-    padding: 60px 20px; /* menos padding para móviles */
-    box-sizing: border-box;
-  }
-
-  input[type="text"],
-  input[type="password"],
-  input[type="email"] {
-    padding: 14px;
-    font-size: 16px;
-  }
-
-  button {
-    padding: 16px;
-    font-size: 16px;
-  }
-
-  h2 {
-    font-size: 28px;
-    margin-bottom: 20px;
-  }
+    overflow: hidden;
+    background-image: url('../imgs/backLogin.png'); 
+    background-size: cover;
+    background-position: center;
 }
 
-/* Ajustes extra para móviles más pequeños */
-@media (max-width: 400px) {
-  h2 {
-    font-size: 24px;
-  }
+@media (max-width: 768px) {
+    .contenedor {
+        flex-direction: column;
+        height: auto;
+        background-image: url('../imgs/backLogin.png');
+        background-size: cover;
+        background-position: center;
+    }
 
-  label {
-    font-size: 16px;
-  }
+    .imagen {
+        display: none;
+    }
 
-  .google-login {
-    font-size: 16px;
-  }
+    .formulario {
+        width: 100%;
+        min-height: 100vh;
+        padding: 25px;
+        background-color: rgba(255, 255, 255, 0.7); 
+        backdrop-filter: blur(4px);
+    }
+}
 
-  .google-login .google-icon {
-    font-size: 28px;
-  }
+@media (max-width: 480px) {
+    .formulario {
+        padding: 20px;
+    }
 
-  .registro {
-    font-size: 14px;
-  }
+    input,
+    button {
+        font-size: 15px;
+    }
+
+    .google-icon {
+        width: 40px;
+        height: 40px;
+        line-height: 40px;
+        font-size: 28px;
+    }
+
+    .registro {
+        font-size: 14px;
+    }
 }
