@@ -25,14 +25,20 @@ document.querySelector('.add-to-cart').addEventListener('click', () => {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: `productId=${productId}&quantity=${quantity}`
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('Producto añadido al carrito.');
-            window.location.href = `index.php`;
-        } else {
-            alert('Error al añadir al carrito.');
-        }
-    });
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Producto añadido al carrito.");
+                window.location.href = "index.php";
+            } else {
+                alert(`Error: ${data.message}`);
+                console.error(data);
+            }
+        })
+        .catch(error => {
+            console.error("Error de red:", error);
+            alert("Error de red al añadir al carrito.");
+        });
+
 });
 
