@@ -17,7 +17,7 @@
                 <h1>BARROCO</h1>
                 <div class="icon-links">
                     <a href="#"><i class="fa-regular fa-user"></i></a>
-                    <a href="#"><i class="fa-solid fa-cart-shopping"></i></a>
+                    <a href="../pages/cart.php"><i class="fa-solid fa-cart-shopping"></i></a>
                     <a href="#"><i class="fa-solid fa-clipboard-list"></i></a>
                 </div>
             </div>
