@@ -1,17 +1,35 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Barroco</title>
-</head>
-<body>
+<?php
+include_once "../components/header.php";
+?>
+<link rel="stylesheet" href="../assests/css/cart.css">
 
-<?php include '../components/header.php'; ?>
+<div class="cart-hero">
+    <h2>Mi carrito</h2>
+</div>
 
-<main>
-    <h2>cart</h2>
-</main>
+<div class="cart-container">
+    <div id="cart-items"></div>
 
-</body>
-</html>
+    <div class="cart-footer">
+        <button class="pay-btn">Pagar</button>
+        <p id="total-price"><strong>Total: 0$</strong></p>
+    </div>
+</div>
+
+<script src="../assests/js/cart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        renderCart();
+
+        document.addEventListener("click", function (e) {
+            if (e.target.classList.contains("btn-minus")) {
+                const id = parseInt(e.target.dataset.id);
+                updateQty(id, -1);
+            }
+            if (e.target.classList.contains("btn-plus")) {
+                const id = parseInt(e.target.dataset.id);
+                updateQty(id, 1);
+            }
+        });
+    });
+</script>

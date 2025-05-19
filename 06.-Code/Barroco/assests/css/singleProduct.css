@@ -1,0 +1,141 @@
+body {
+    margin: 0;
+    font-family: 'Didact Gothic', sans-serif;
+    background-color: #FEFAE0;
+}
+
+header{
+  position: fixed;
+  width: 100%;
+  z-index: 1000;
+}
+
+.product-page {
+    padding: 145px 10px 10px;
+    display: flex;
+    justify-content: center;
+}
+
+.product-card {
+    display: flex;
+    gap: 30px;
+    background-color: #FAEDCD;
+    padding: 30px;
+    border-radius: 20px;
+    max-width: 1000px;
+    width: 100%;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.image-section {
+    flex: 0.6;
+    max-width: 500px;
+}
+
+.image-section img {
+    width: 100%;
+    border-radius: 20px;
+    object-fit: cover;
+    min-width: 200px;
+}
+
+.image-dots {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.image-dots span {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background: #D3A373;
+    border-radius: 50%;
+    margin: 0 5px;
+}
+
+.info-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.title {
+    font-size: 32px;
+    font-weight: bold;
+    color: #333;
+}
+
+.price {
+    font-size: 24px;
+    color: #D3A373;
+    margin-bottom: 20px;
+}
+
+.description {
+    margin: 10px 0;
+    color: #444;
+}
+
+ul {
+    margin: 0;
+    padding-left: 18px;
+    color: #333;
+}
+
+.colors {
+    margin: 20px 0;
+}
+
+.colors span {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+}
+
+.quantity {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.quantity button {
+    background-color: #CCD5AE;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 10px;
+    font-size: 10px;
+    cursor: pointer;
+}
+
+.quantity button:hover{
+    transform: scale(1.03);
+}
+
+.quantity input {
+    width: 50px;
+    text-align: center;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+}
+
+.add-to-cart {
+    background-color: #D3A373;
+    color: white;
+    border: none;
+    padding: 15px;
+    font-size: 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.add-to-cart:hover {
+    background-color: #B9CCAE;
+}

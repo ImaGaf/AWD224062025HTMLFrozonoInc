@@ -13,11 +13,11 @@
     <body>
         <header class="barroco-header">
             <div class="header-container">
-                <img class="logo" src="../assests/imgs/barrocoLogo.png" alt="">
+                <img class="logo" id="logo" src="../assests/imgs/barrocoLogo.png" alt="">
                 <h1>BARROCO</h1>
                 <div class="icon-links">
                     <a href="#"><i class="fa-regular fa-user"></i></a>
-                    <a href="#"><i class="fa-solid fa-cart-shopping"></i></a>
+                    <a href="../pages/cart.php"><i class="fa-solid fa-cart-shopping"></i></a>
                     <a href="#"><i class="fa-solid fa-clipboard-list"></i></a>
                 </div>
             </div>
@@ -30,6 +30,7 @@
                 <a href="#">Cuencos y bowls</a>
             </nav>
         </header>
+        <script src="../assests/js/header.js"></script>
     </body>
 
     </html>
