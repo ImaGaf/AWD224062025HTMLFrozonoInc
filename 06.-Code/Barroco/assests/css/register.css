@@ -1,0 +1,83 @@
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: #c2d4b3;
+}
+
+.contenedor {
+    display: flex;
+    height: 100vh;
+}
+
+.formulario {
+    width: 50%;
+    background-color: #c2d4b3;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 40px;
+}
+
+.formulario h2 {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+label {
+    font-size: 16px;
+    margin-top: 15px;
+    margin-bottom: 5px;
+}
+
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+button {
+    background-color: #d2a573;
+    color: black;
+    font-weight: bold;
+    border: none;
+    padding: 14px;
+    width: 100%;
+    border-radius: 6px;
+    margin-top: 10px;
+    box-shadow: 0 4px 4px rgba(0,0,0,0.2);
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #c89558;
+}
+
+.google-login {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.google-login .google-icon {
+    font-size: 32px;
+    font-weight: bold;
+}
+
+.registro {
+    font-size: 14px;
+}
+
+.registro a {
+    color: #d2a573;
+    text-decoration: none;
+}
+
+.imagen {
+    width: 50%;
+    background: url('../assests/imgs/backLogin.png') no-repeat center center;
+    background-size: cover;
+}
