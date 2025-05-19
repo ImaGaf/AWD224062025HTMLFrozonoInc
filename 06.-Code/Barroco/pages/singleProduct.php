@@ -59,8 +59,6 @@ $product = $result->fetch_assoc();
                     <input type="number" id="quantity" value="1" min="1">
                     <button id="increase"><i class="fa-solid fa-plus"></i></button>
                 </div>
-
-
                 <button class="add-to-cart">AÑADIR AL CARRITO</button>
             </div>
         </div>

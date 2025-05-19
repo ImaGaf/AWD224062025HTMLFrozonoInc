@@ -1,61 +1,37 @@
-// Datos iniciales quemados
-const defaultCart = [
-    {
-        id: 1,
-        img: "../assests/imgs/cart1.png",
-        name: "Frasco de Ornitorrinco",
-        price: 25.00,
-        desc: "Frasco en forma de Ornitorrinco.",
-        quantity: 1
-    },
-    {
-        id: 2,
-        img: "../assests/imgs/cart2.png",
-        name: "Juegos de platos",
-        price: 74.99,
-        desc: "Juego de platos de cerámica; 4 platos soperos, 4 platos pequeños, 4 tazas.",
-        quantity: 1
-    },
-    {
-        id: 3,
-        img: "../assests/imgs/cart3.png",
-        name: "Florero con decoraciones doradas",
-        price: 15.50,
-        desc: "Florero de cerámica con estampado de flores en azul y decoraciones doradas.",
-        quantity: 1
-    },
-    {
-        id: 4,
-        img: "../assests/imgs/cart2.png",
-        name: "Taza personalizada",
-        price: 9.99,
-        desc: "Taza de cerámica blanca con diseño personalizado.",
-        quantity: 1
+async function getCartFromServer() {
+    try {
+        const response = await fetch('../server/getCar.php');
+        if (!response.ok) throw new Error("Error al cargar carrito");
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error(error);
+        return [];
     }
-];
+}
 
-function getCart() {
-    let cart = localStorage.getItem("cart");
-    if (cart) {
-        cart = JSON.parse(cart);
-        // Agrega automáticamente productos nuevos del defaultCart que no estén en el cart actual
-        defaultCart.forEach(defaultItem => {
-            if (!cart.some(item => item.id === defaultItem.id)) {
-                cart.push(defaultItem);
-            }
-        });
-        return cart;
+async function updateQty(idItemCart, change) {
+    const itemSpan = document.querySelector(`button[data-id='${idItemCart}']`).parentNode.querySelector("span");
+    let quantity = parseInt(itemSpan.innerText) + change;
+    if (quantity < 1) quantity = 1;
+
+    const response = await fetch('../server/updateCart.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idItemCart, quantity })
+    });
+
+    const result = await response.json();
+    if (result.success) {
+        renderCart(); 
     } else {
-        return defaultCart;
+        alert("Error al actualizar el carrito: " + (result.message || "Desconocido"));
     }
 }
 
-function saveCart(cart) {
-    localStorage.setItem("cart", JSON.stringify(cart));
-}
 
-function renderCart() {
-    const cart = getCart();
+async function renderCart() {
+    const cart = await getCartFromServer();
     const container = document.getElementById("cart-items");
     container.innerHTML = "";
 
@@ -75,38 +51,13 @@ function renderCart() {
                 <p>${item.desc}</p>
             </div>
             <div class="cart-quantity">
-                <button data-id="${item.id}" class="btn-minus">-</button>
+                <button data-id="${item.idItemCart}" class="btn-minus">-</button>
                 <span>${item.quantity}</span>
-                <button data-id="${item.id}" class="btn-plus">+</button>
+                <button data-id="${item.idItemCart}" class="btn-plus">+</button>
             </div>
         `;
         container.appendChild(div);
     });
 
     document.getElementById("total-price").innerHTML = `<strong>Total: ${total.toFixed(2)}$</strong>`;
-
-    // Asignar eventos
-    document.querySelectorAll(".btn-plus").forEach(btn => {
-        btn.addEventListener("click", () => updateQty(parseInt(btn.dataset.id), 1));
-    });
-
-    document.querySelectorAll(".btn-minus").forEach(btn => {
-        btn.addEventListener("click", () => updateQty(parseInt(btn.dataset.id), -1));
-    });
-
-    // Guardar los cambios en el carrito sincronizado
-    saveCart(cart);
 }
-
-function updateQty(id, change) {
-    const cart = getCart();
-    const item = cart.find(i => i.id === id);
-    if (item) {
-        item.quantity += change;
-        if (item.quantity < 1) item.quantity = 1;
-        saveCart(cart);
-        renderCart();
-    }
-}
-
-window.addEventListener("DOMContentLoaded", renderCart);
