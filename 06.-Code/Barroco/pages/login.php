@@ -11,9 +11,8 @@
         <div class="formulario">
             <h2>BIENVENIDO</h2>
             <form action="../server/login.php" method="post">
-                <label for="usuario">Usuario</label>
-                <input type="text" id="usuario" name="usuario" placeholder="Usuario" required>
-
+                <label for="usuario">Correo</label>
+                <input type="text" id="usuario" name="usuario" placeholder="Correo" required>
                 <label for="password">Contraseña</label>
                 <input type="password" id="password" name="password" placeholder="Contraseña" required>
 
