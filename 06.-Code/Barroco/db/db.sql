@@ -1,15 +1,3 @@
-SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
-SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
-SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
-
-CREATE SCHEMA IF NOT EXISTS `barroco`
-  DEFAULT CHARACTER SET utf8mb4
-  COLLATE utf8mb4_general_ci;
-
-
-USE `barroco`;
-
-
 CREATE TABLE IF NOT EXISTS `user` (
   `idUser` INT(11) NOT NULL AUTO_INCREMENT,
   `firstName` VARCHAR(50),
@@ -17,21 +5,21 @@ CREATE TABLE IF NOT EXISTS `user` (
   `email` VARCHAR(100),
   `password` VARCHAR(255),
   PRIMARY KEY (`idUser`),
-  UNIQUE INDEX `email` (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  UNIQUE (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `employee` (
   `idEmployee` INT(11) NOT NULL,
   `role` VARCHAR(50),
   PRIMARY KEY (`idEmployee`),
   FOREIGN KEY (`idEmployee`) REFERENCES `user` (`idUser`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `administrator` (
   `idAdmin` INT(11) NOT NULL,
   PRIMARY KEY (`idAdmin`),
   FOREIGN KEY (`idAdmin`) REFERENCES `employee` (`idEmployee`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `customer` (
   `idCustomer` INT(11) NOT NULL,
@@ -39,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `customer` (
   `billingAddress` TEXT,
   PRIMARY KEY (`idCustomer`),
   FOREIGN KEY (`idCustomer`) REFERENCES `user` (`idUser`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `order` (
   `idOrder` INT(11) NOT NULL AUTO_INCREMENT,
@@ -50,25 +38,24 @@ CREATE TABLE IF NOT EXISTS `order` (
   `deliveryAddress` TEXT,
   `status` VARCHAR(50),
   PRIMARY KEY (`idOrder`),
-  INDEX (`idCustomer`),
   FOREIGN KEY (`idCustomer`) REFERENCES `customer` (`idCustomer`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `shopping_cart` (
   `idShoppingCart` INT(11) NOT NULL AUTO_INCREMENT,
   `idOrder` INT(11),
   `total` DECIMAL(10,2),
   PRIMARY KEY (`idShoppingCart`),
-  UNIQUE INDEX (`idOrder`),
+  UNIQUE (`idOrder`),
   FOREIGN KEY (`idOrder`) REFERENCES `order` (`idOrder`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `category` (
   `idCategory` INT(11) NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(100),
   `description` TEXT,
   PRIMARY KEY (`idCategory`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `product` (
   `idProduct` INT(11) NOT NULL AUTO_INCREMENT,
@@ -79,9 +66,8 @@ CREATE TABLE IF NOT EXISTS `product` (
   `category` INT(11),
   `url` VARCHAR(200),
   PRIMARY KEY (`idProduct`),
-  INDEX (`category`),
   FOREIGN KEY (`category`) REFERENCES `category` (`idCategory`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `cart_item` (
   `idItemCart` INT(11) NOT NULL AUTO_INCREMENT,
@@ -90,20 +76,17 @@ CREATE TABLE IF NOT EXISTS `cart_item` (
   `quantity` INT(11),
   `subtotal` DECIMAL(10,2),
   PRIMARY KEY (`idItemCart`),
-  INDEX (`idShoppingCart`),
-  INDEX (`idProduct`),
   FOREIGN KEY (`idShoppingCart`) REFERENCES `shopping_cart` (`idShoppingCart`),
   FOREIGN KEY (`idProduct`) REFERENCES `product` (`idProduct`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `customer_product` (
   `idCustomer` INT(11) NOT NULL,
   `idProduct` INT(11) NOT NULL,
   PRIMARY KEY (`idCustomer`, `idProduct`),
-  INDEX (`idProduct`),
   FOREIGN KEY (`idCustomer`) REFERENCES `customer` (`idCustomer`),
   FOREIGN KEY (`idProduct`) REFERENCES `product` (`idProduct`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `payment` (
   `idPayment` INT(11) NOT NULL AUTO_INCREMENT,
@@ -113,11 +96,10 @@ CREATE TABLE IF NOT EXISTS `payment` (
   `paymentMethod` VARCHAR(50),
   `status` VARCHAR(50),
   PRIMARY KEY (`idPayment`),
-  UNIQUE INDEX (`idOrder`),
-  INDEX (`idCustomer`),
+  UNIQUE (`idOrder`),
   FOREIGN KEY (`idCustomer`) REFERENCES `customer` (`idCustomer`),
   FOREIGN KEY (`idOrder`) REFERENCES `order` (`idOrder`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `invoice` (
   `idInvoice` INT(11) NOT NULL AUTO_INCREMENT,
@@ -127,10 +109,11 @@ CREATE TABLE IF NOT EXISTS `invoice` (
   `tax` DECIMAL(10,2),
   `totalAmount` DECIMAL(10,2),
   PRIMARY KEY (`idInvoice`),
-  UNIQUE INDEX (`idPayment`),
+  UNIQUE (`idPayment`),
   FOREIGN KEY (`idPayment`) REFERENCES `payment` (`idPayment`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- DATOS INICIALES
 
 INSERT INTO `user` (`firstName`, `lastName`, `email`, `password`) VALUES
 ('María', 'López', 'maria.lopez@example.com', SHA2('maria123', 256)),
@@ -177,7 +160,3 @@ INSERT INTO `payment` (`idOrder`, `idCustomer`, `amount`, `paymentMethod`, `stat
 
 INSERT INTO `invoice` (`idPayment`, `discount`, `issueDate`, `tax`, `totalAmount`) VALUES
 (1, 0.00, CURDATE(), 6.53, 50.03);
-
-SET SQL_MODE=@OLD_SQL_MODE;
-SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
-SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
