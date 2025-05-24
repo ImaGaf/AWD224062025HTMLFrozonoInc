@@ -1,8 +1,8 @@
 <?php
 session_start();
 
+include '../server/conexion.php';
 
-include 'conexion.php';
 
 if (!isset($_SESSION['cart_id'])) {
     http_response_code(404);

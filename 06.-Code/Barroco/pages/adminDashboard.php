@@ -53,6 +53,24 @@ while ($row = $ventasUsuario->fetch_assoc()) {
     $fechas[] = $row['date'];
     $totales[] = (float) $row['total'];
 }
+
+// Ventas por categoría
+$ventasPorCategoria = $conn->query("SELECT c.name AS categoria, SUM(o.total) AS totalVentas FROM `order` o JOIN shopping_cart sc ON o.idOrder = sc.idOrder JOIN cart_item ci ON sc.idShoppingCart = ci.idShoppingCart JOIN product p ON ci.idProduct = p.idProduct JOIN category c ON p.category = c.idCategory GROUP BY c.name");
+$categorias = [];
+$ventasCategoria = [];
+while ($row = $ventasPorCategoria->fetch_assoc()) {
+    $categorias[] = $row['categoria'];
+    $ventasCategoria[] = (float) $row['totalVentas'];
+}
+
+// Órdenes por estado
+$ordenesPorEstado = $conn->query("SELECT status, COUNT(*) AS total FROM `order` GROUP BY status");
+$estados = [];
+$conteoEstados = [];
+while ($row = $ordenesPorEstado->fetch_assoc()) {
+    $estados[] = $row['status'];
+    $conteoEstados[] = (int) $row['total'];
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -81,37 +99,33 @@ while ($row = $ventasUsuario->fetch_assoc()) {
                 <p>Productos Comprados</p>
             </div>
         </div>
+        
+        <h2 style="text-align: center; color: #B9CCAE; margin-bottom: 20px;">Ventas por Día</h2>
+        <canvas class="chart1" id="ventasChart"></canvas>
 
-        <h2 style="text-align: center; color: #B9CCAE; margin-bottom: 20px;">Gastos por Día</h2>
-        <canvas id="gastosChart" width="600" height="300"></canvas>
+        <div class="chartsRow">
+            <div>
+                <h2 style="text-align: center; color: #B9CCAE; margin-top: 40px;">Ventas por Categoría</h2>
+                <canvas class="chart" id="categoriaChart"></canvas>
+            </div>
+
+            <div>
+                <h2 style="text-align: center; color: #B9CCAE; margin-top: 40px;">Órdenes por Estado</h2>
+                <canvas class="chart" id="estadoChart"></canvas>
+            </div>
+
+        </div>
+
 
         <script>
-            const ctx = document.getElementById('gastosChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: <?= json_encode($fechas) ?>,
-                    datasets: [{
-                        label: 'Gasto ($)',
-                        data: <?= json_encode($totales) ?>,
-                        backgroundColor: 'rgba(166, 195, 173, 0.2)',
-                        borderColor: '#A6C3AD',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.3,
-                        pointBackgroundColor: '#D3A373'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
+            const fechas = <?= json_encode($fechas) ?>;
+            const totales = <?= json_encode($totales) ?>;
+            const categorias = <?= json_encode($categorias) ?>;
+            const ventasCategoria = <?= json_encode($ventasCategoria) ?>;
+            const estados = <?= json_encode($estados) ?>;
+            const conteoEstados = <?= json_encode($conteoEstados) ?>;
         </script>
+        <script src="../assests/js/dashboard.js"></script>
     </main>
 </body>
 </html>
