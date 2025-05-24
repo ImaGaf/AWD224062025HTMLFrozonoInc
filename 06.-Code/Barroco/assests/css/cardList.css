@@ -77,13 +77,6 @@ header{
   margin: 0;
 }
 
-.grid-container {
-    margin: auto;
-    column-count: 3;
-    column-gap: 1rem;
-    padding: 1rem;
-    width: 85%;
-}
 
 .search-bar{
   text-align: end ;
@@ -103,4 +96,35 @@ header{
   position: absolute;
   right: 150px;
   top: 29px;
+}
+
+.grid-container {
+  margin: auto;
+  column-gap: 1rem;
+  padding: 1rem;
+  width: 85%;
+  column-count: 4;
+}
+
+@media (max-width: 1400px) {
+  .grid-container {
+    column-count: 3;
+  }
+}
+
+@media (max-width: 1000px) {
+  .grid-container {
+    column-count: 2;
+  }
+}
+
+@media (max-width: 650px) {
+  .grid-container {
+    column-count: 1;
+  }
+}
+
+.product-card {
+  break-inside: avoid;
+  margin-bottom: 1rem;
 }
