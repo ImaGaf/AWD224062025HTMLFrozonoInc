@@ -38,7 +38,7 @@ if ($result && $row = $result->fetch_assoc()) {
     $productosComprados = (int) $row['total'];
 }
 
-// Fechas y totales para el gráfico
+
 $ventasUsuario = $conn->query("
     SELECT date, SUM(total) AS total 
     FROM `order` 
