@@ -24,7 +24,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $_SESSION['usuario'] = $row['firstName'];
 
             $idUser = $row['idUser'];
-            $customerId = $idUser;
+
+            $adminCheck = $conn->prepare("SELECT idAdmin FROM administrator WHERE idAdmin = ?");
+            $adminCheck->bind_param("i", $idUser);
+            $adminCheck->execute();
+            $adminResult = $adminCheck->get_result();
+
+            if ($adminResult->num_rows > 0) {
+                $_SESSION['role'] = 'admin';
+                header("Location: ../pages/adminDashboard.php"); 
+                exit;
+            }
+
+            $_SESSION['role'] = 'customer';
+
             $cartQuery = $conn->prepare("
                 SELECT sc.idShoppingCart 
                 FROM shopping_cart sc
@@ -32,7 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 WHERE o.idCustomer = ? AND o.status = 'pendiente'
                 LIMIT 1
             ");
-            $cartQuery->bind_param("i", $customerId);
+            $cartQuery->bind_param("i", $idUser);
             $cartQuery->execute();
             $cartResult = $cartQuery->get_result();
 
@@ -46,7 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             header("Location: ../pages/index.php");
             exit;
         } else {
-            echo "<script>alert('Contrase\u00f1a incorrecta.'); window.location.href = '../pages/login.php';</script>";
+            echo "<script>alert('Contraseña incorrecta.'); window.location.href = '../pages/login.php';</script>";
             exit;
         }
     } else {
