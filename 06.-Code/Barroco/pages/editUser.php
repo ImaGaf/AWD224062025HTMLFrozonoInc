@@ -1,8 +1,18 @@
 <?php
 include_once "../server/conexion.php";
 
+// Obtenemos todos los usuarios
 $sql = "SELECT * FROM `user`";
 $result = $conn->query($sql);
+
+// Comprobar si se está editando un usuario (editar o agregar)
+$editUser = isset($_GET['idUser']) ? $_GET['idUser'] : null;
+
+if ($editUser) {
+    $editQuery = "SELECT * FROM `user` WHERE `idUser` = $editUser";
+    $editResult = $conn->query($editQuery);
+    $userData = $editResult->fetch_assoc();
+}
 ?>
 
 <!DOCTYPE html>
@@ -18,24 +28,26 @@ $result = $conn->query($sql);
     <h1>Gestión de Empleados</h1>
 
     <!-- Formulario de Agregar/Editar Empleado -->
-    <h2>Agregar o Editar Empleado</h2>
-    <form id="employeeForm">
-        <input type="hidden" name="action" id="action" value="add">
-        <input type="hidden" name="idUser" id="idUser" value="">
+    <h2><?php echo $editUser ? 'Editar' : 'Agregar'; ?> Empleado</h2>
+    <form id="employeeForm" method="POST" action="../server/<?php echo $editUser ? 'updateUser.php' : 'addUser.php'; ?>">
+        <input type="hidden" name="idUser" id="idUser" value="<?php echo $editUser ? $userData['idUser'] : ''; ?>">
 
         <label for="firstName">Nombre:</label>
-        <input type="text" id="firstName" name="firstName" required><br><br>
+        <input type="text" id="firstName" name="firstName" value="<?php echo $editUser ? $userData['firstName'] : ''; ?>" required><br><br>
 
         <label for="lastName">Apellido:</label>
-        <input type="text" id="lastName" name="lastName" required><br><br>
+        <input type="text" id="lastName" name="lastName" value="<?php echo $editUser ? $userData['lastName'] : ''; ?>" required><br><br>
 
         <label for="email">Correo Electrónico:</label>
-        <input type="email" id="email" name="email" required><br><br>
+        <input type="email" id="email" name="email" value="<?php echo $editUser ? $userData['email'] : ''; ?>" required><br><br>
 
         <label for="role">Rol:</label>
-        <input type="text" id="role" name="role" required><br><br>
+        <select id="role" name="role" required>
+            <option value="Empleado" <?php echo $editUser && $userData['role'] == 'Empleado' ? 'selected' : ''; ?>>Empleado</option>
+            <option value="Administrador" <?php echo $editUser && $userData['role'] == 'Administrador' ? 'selected' : ''; ?>>Administrador</option>
+        </select><br><br>
 
-        <button type="submit" id="submitBtn">Agregar Empleado</button>
+        <button type="submit"><?php echo $editUser ? 'Actualizar' : 'Agregar'; ?> Empleado</button>
     </form>
 
     <h2>Lista de Empleados</h2>
@@ -59,8 +71,7 @@ $result = $conn->query($sql);
                     <td><?php echo $row['email']; ?></td>
                     <td><?php echo $row['role']; ?></td>
                     <td>
-                        <button class="editBtn" data-id="<?php echo $row['idUser']; ?>">Editar</button>
-                        <button class="deleteBtn" data-id="<?php echo $row['idUser']; ?>">Eliminar</button>
+                        <a href="editUser.php?idUser=<?php echo $row['idUser']; ?>">Editar</a>
                     </td>
                 </tr>
             <?php endwhile; ?>

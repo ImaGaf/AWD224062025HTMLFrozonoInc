@@ -35,6 +35,7 @@ switch ($action) {
         break;
 
     case 'delete':
+        // Eliminar empleado
         $idUser = $_POST['idUser'];
 
         $sql = "DELETE FROM `user` WHERE `idUser` = ?";

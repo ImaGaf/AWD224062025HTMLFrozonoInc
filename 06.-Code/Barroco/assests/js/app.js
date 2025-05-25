@@ -1,4 +1,3 @@
-// Escuchar el envío del formulario
 document.getElementById('employeeForm').addEventListener('submit', function(e) {
     e.preventDefault();
 
@@ -23,7 +22,6 @@ document.addEventListener('click', function(e) {
     if (e.target.classList.contains('editBtn')) {
         let id = e.target.dataset.id;
 
-        // Obtener los datos del empleado para editar
         fetch(`server/manageUser.php?action=edit&idUser=${id}`)
             .then(response => response.json())
             .then(data => {
@@ -54,7 +52,7 @@ document.addEventListener('click', function(e) {
             .then(data => {
                 alert(data.message);
                 if (data.status === 'success') {
-                    location.reload();  // Recargar para reflejar el cambio
+                    location.reload();
                 }
             })
             .catch(error => console.error('Error:', error));
