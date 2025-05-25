@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'conexion.php';
+include '../server/conexion.php';
 
 if (!isset($_SESSION['idUser'])) {
     echo json_encode(["success" => false, "message" => "Usuario no autenticado."]);
@@ -35,6 +35,7 @@ if ($productQuery->num_rows === 0) {
 $product = $productQuery->fetch_assoc();
 $subtotal = $quantity * $product['price'];
 $conn->query("INSERT INTO cart_item (idShoppingCart, idProduct, quantity, subtotal) VALUES ($cartId, $productId, $quantity, $subtotal)");
+
 
 $conn->query("UPDATE shopping_cart SET total = (SELECT IFNULL(SUM(subtotal), 0) FROM cart_item WHERE idShoppingCart = $cartId) WHERE idShoppingCart = $cartId");
 $conn->query("UPDATE `order` SET total = (SELECT total FROM shopping_cart WHERE idShoppingCart = $cartId) WHERE idOrder = (SELECT idOrder FROM shopping_cart WHERE idShoppingCart = $cartId)");
