@@ -1,3 +1,13 @@
+header{
+  position: fixed;
+  width: 100%;
+  z-index: 1000;
+}
+
+.car-page{
+    padding-top: 135px;
+}
+
 .cart-container {
     background-color: #fefbe8;
     padding: 20px;
@@ -33,6 +43,7 @@
     padding-right: 10px;
     flex-grow: 1;
     min-width: 200px;
+    width: 70%;
 }
 
 .cart-quantity {
@@ -50,6 +61,10 @@
     border: none;
     border-radius: 5px;
     cursor: pointer;
+}
+
+.cart-quantity button:hover{
+    transform: scale(1.03);
 }
 
 .cart-item input[type="checkbox"] {
@@ -80,6 +95,10 @@
     font-size: 1.2rem;
     font-weight: bold;
     cursor: pointer;
+}
+
+.pay-btn:hover{
+    transform: scale(1.03);
 }
 
 .hero-banner {
@@ -136,7 +155,6 @@
     min-height: 350px;
 }
 
-/* RESPONSIVE DESIGN */
 
 @media (max-width: 768px) {
     .cart-item {

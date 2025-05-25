@@ -1,14 +1,16 @@
 <?php
 session_start();
+
 include '../server/conexion.php';
 
-if (!isset($_SESSION['idShoppingCart'])) {
+
+if (!isset($_SESSION['cart_id'])) {
     http_response_code(404);
     echo json_encode(["error" => "No hay carrito activo"]);
     exit;
 }
 
-$idCart = intval($_SESSION['idShoppingCart']);
+$idCart = intval($_SESSION['cart_id']);
 
 $sql = "SELECT ci.idItemCart, p.url AS img, p.name, p.description AS `desc`, p.price, ci.quantity
         FROM cart_item ci

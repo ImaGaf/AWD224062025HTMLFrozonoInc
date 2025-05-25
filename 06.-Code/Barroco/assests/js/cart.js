@@ -23,7 +23,7 @@ async function updateQty(idItemCart, change) {
 
     const result = await response.json();
     if (result.success) {
-        renderCart(); 
+        renderCart();
     } else {
         alert("Error al actualizar el carrito: " + (result.message || "Desconocido"));
     }
@@ -36,7 +36,6 @@ async function renderCart() {
     container.innerHTML = "";
 
     let total = 0;
-
     cart.forEach(item => {
         total += item.price * item.quantity;
 
@@ -47,7 +46,7 @@ async function renderCart() {
             <img src="${item.img}" alt="${item.name}" class="cart-img">
             <div class="cart-info">
                 <h3>${item.name}</h3>
-                <p><strong>Precio:</strong> ${item.price.toFixed(2)}$</p>
+                <p><strong>Precio:</strong> ${parseFloat(item.price).toFixed(2)}$</p>
                 <p>${item.desc}</p>
             </div>
             <div class="cart-quantity">
@@ -61,3 +60,23 @@ async function renderCart() {
 
     document.getElementById("total-price").innerHTML = `<strong>Total: ${total.toFixed(2)}$</strong>`;
 }
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    renderCart();
+
+    document.addEventListener("click", function (e) {
+        if (e.target.classList.contains("btn-minus")) {
+            const id = parseInt(e.target.dataset.id);
+            updateQty(id, -1);
+        }
+        if (e.target.classList.contains("btn-plus")) {
+            const id = parseInt(e.target.dataset.id);
+            updateQty(id, 1);
+        }
+    });
+});
+
+document.getElementById("pay-button").addEventListener("click", () => {
+    window.location.href = "../pages/payment.php";
+});

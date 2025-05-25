@@ -82,6 +82,13 @@ h1{
     color: #f78f1e;
 }
 
+
+.nav-links a.active {
+    font-weight: bold;
+    border-bottom: 2px solid #A6C3AD; 
+}
+
+
 @media screen and (max-width: 768px) {
     .header-container {
         flex-direction: column;
