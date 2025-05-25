@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'conexion.php';
+include '../server/conexion.php';
 
 $productId = intval($_POST['productId']);
 $quantity = intval($_POST['quantity']);
@@ -20,12 +20,12 @@ $product = $productQuery->fetch_assoc();
 $subtotal = $quantity * $product['price'];
 
 $sqlInsert = "INSERT INTO cart_item (idShoppingCart, idProduct, quantity, subtotal)
-              VALUES ($cartId, $productId, $quantity, $subtotal)";
+            VALUES ($cartId, $productId, $quantity, $subtotal)";
 $conn->query($sqlInsert);
 
 $conn->query("UPDATE shopping_cart 
-              SET total = (SELECT SUM(subtotal) FROM cart_item WHERE idShoppingCart = $cartId)
-              WHERE idShoppingCart = $cartId");
+            SET total = (SELECT SUM(subtotal) FROM cart_item WHERE idShoppingCart = $cartId)
+            WHERE idShoppingCart = $cartId");
 
 echo json_encode(["success" => true]);
 
