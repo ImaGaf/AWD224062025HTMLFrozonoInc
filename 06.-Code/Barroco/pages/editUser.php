@@ -72,8 +72,6 @@ if ($editUser) {
                     <td><?php echo $row['role']; ?></td>
                     <td>
                         <a href="editUser.php?idUser=<?php echo $row['idUser']; ?>">Editar</a>
-
-                        <a href="../server/deleteUser.php?idUser=<?php echo $row['idUser']; ?>">Eliminar</a>
                     </td>
                 </tr>
             <?php endwhile; ?>

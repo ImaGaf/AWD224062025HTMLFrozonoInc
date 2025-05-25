@@ -3,13 +3,11 @@ include_once "conexion.php";
 
 $editUser = false;
 $userData = null;
-$userRole = null;  // Inicializar la variable
+$userRole = null;
 
-// Verificar si estamos editando un usuario
 if (isset($_GET['id'])) {
     $idUser = $_GET['id'];
 
-    // Consultar el usuario para obtener la información
     $sql = "SELECT u.*, e.role FROM `user` u 
             LEFT JOIN `employee` e ON u.idUser = e.idEmployee
             WHERE u.idUser = $idUser";
@@ -18,7 +16,7 @@ if (isset($_GET['id'])) {
     if ($result->num_rows > 0) {
         $userData = $result->fetch_assoc();
         $editUser = true;
-        $userRole = $userData['role']; // Obtener el rol del usuario
+        $userRole = $userData['role'];
     }
 }
 
@@ -36,7 +34,6 @@ if (isset($_GET['id'])) {
     <label for="email">Correo electrónico:</label>
     <input type="email" name="email" value="<?php echo $editUser ? $userData['email'] : ''; ?>" required><br><br>
 
-    <!-- Selección del rol -->
     <label for="role">Rol:</label>
     <select id="role" name="role" required>
         <option value="Empleado" <?php echo ($editUser && $userRole == 'Empleado') ? 'selected' : ''; ?>>Empleado</option>
