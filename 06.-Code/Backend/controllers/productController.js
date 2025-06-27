@@ -44,3 +44,33 @@ exports.remove = async (req, res) => {
     res.status(404).json({ message: err.message });
   }
 };
+
+
+exports.getAvailable = async (req, res) => {
+  try {
+    const products = await productService.getAvailableProducts();
+    res.json(products);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.getCustomDiscounted = async (req, res) => {
+  try {
+    const products = await productService.getCustomDiscountedProducts();
+    res.json(products);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.purchase = async (req, res) => {
+  try {
+    const { idProduct } = req.params;
+    const { quantity } = req.body;
+    const result = await productService.purchaseProduct(idProduct, quantity);
+    res.json(result);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};

@@ -26,3 +26,48 @@ exports.deleteProduct = async (id) => {
   if (!deleted) throw new Error("Producto no encontrado");
   return deleted;
 };
+
+exports.getAvailableProducts = async () => {
+  return await Product.find({ stock: { $gt: 0 } });
+};
+
+exports.getCustomDiscountedProducts = async () => {
+  const customProducts = await Product.find({ custom: true });
+  return customProducts.map(p => ({
+    idProduct: p.idProduct,
+    name: p.name,
+    description: p.description,
+    originalPrice: p.price,
+    discountedPrice: +(p.price * 0.9).toFixed(2),
+    stock: p.stock,
+    cathegory: p.cathegory,
+    custom: p.custom
+  }));
+};
+
+exports.purchaseProduct = async (idProduct, quantity) => {
+  if (!quantity || quantity <= 0) {
+    throw new Error("Cantidad inválida");
+  }
+
+  const product = await Product.findOne({ idProduct });
+  if (!product) {
+    throw new Error("Producto no encontrado");
+  }
+
+  if (product.stock < quantity) {
+    throw new Error("Stock insuficiente");
+  }
+
+  product.stock -= quantity;
+  await product.save();
+
+  const totalPrice = +(product.price * quantity).toFixed(2);
+
+  return {
+    message: "Compra realizada con éxito",
+    product: product.name,
+    quantity,
+    totalPrice
+  };
+};
