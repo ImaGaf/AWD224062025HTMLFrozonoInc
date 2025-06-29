@@ -13,6 +13,8 @@ app.use("/api/administrators", require("./routes/administratorRoutes"));
 app.use("/api/employees", require("./routes/employeeRoutes"));
 app.use("/api/products", require("./routes/productRoutes"));
 app.use("/api/users", require("./routes/userRoutes"));
+app.use("/api/payments", require("./routes/paymentRoutes"));
+app.use("/api/categories", require("./routes/categoryRoutes"));
 
 app.get("/", (req, res) => {
   res.send("API RESTful de Barroco funcionando correctamente");
