@@ -7,8 +7,8 @@ const orderSchema = new mongoose.Schema({
     required: true
   },
   products: {
-    type: String, 
-    required: true
+    product: String,
+    quantity: Number
   },
   total: {
     type: Number,
@@ -27,9 +27,9 @@ const orderSchema = new mongoose.Schema({
     default: "En proceso"
   }
 },
-{
-  collection: "orders"
-});
+  {
+    collection: "orders"
+  });
 
 const Order = mongoose.model("Order", orderSchema);
 

@@ -1,9 +1,10 @@
-const Invoice = require('../models/Invoice');
-const Product = require('../models/Product');
+const Invoice = require('../models/invoice');
+const Product = require('../models/product');
 const CartItem = require('../models/cartItem');
 const Customer = require('../models/customer');
 const Order = require('../models/order');
 const Payment = require('../models/payment');
+const ShoppingCart = require('../models/shoppingCart')
 
 const getTotalSales = async () => {
   const invoices = await Invoice.find();
@@ -14,16 +15,26 @@ const getTotalSales = async () => {
 const getMostSoldProducts = async () => {
   const items = await CartItem.find().populate('product');
   const counts = {};
+
   items.forEach(item => {
+    if (!item.product || !item.product._id) return;
+
     const id = item.product._id.toString();
     if (!counts[id]) counts[id] = { name: item.product.name, quantity: 0 };
     counts[id].quantity += item.quantity;
   });
+
   const sorted = Object.entries(counts)
     .sort((a, b) => b[1].quantity - a[1].quantity)
-    .map(([productId, data]) => ({ productId, name: data.name, quantity: data.quantity }));
+    .map(([productId, data]) => ({
+      productId,
+      name: data.name,
+      quantity: data.quantity
+    }));
+
   return { topProducts: sorted.slice(0, 5) };
 };
+
 
 const getTopCustomers = async () => {
   const orders = await Order.find();
@@ -39,15 +50,23 @@ const getTopCustomers = async () => {
 };
 
 const getCategorySales = async () => {
-  const items = await CartItem.find().populate({ path: 'product', populate: { path: 'category' } });
+  const items = await CartItem.find()
+    .populate({ path: 'product', populate: { path: 'category' } });
+
   const map = {};
   items.forEach(item => {
-    const category = item.product.category.name;
-    map[category] = (map[category] || 0) + item.subtotal;
+    const product = item.product;
+    if (product && product.category && product.category.name) {
+      const category = product.category.name;
+      console.log(category)
+      map[category] = (map[category] || 0) + item.subtotal;
+    }
   });
+
   const result = Object.entries(map).map(([category, total]) => ({ category, total }));
   return { categorySales: result };
 };
+
 
 const getMonthlyIncome = async () => {
   const invoices = await Invoice.find();
@@ -71,7 +90,8 @@ const getPaymentMethodUsage = async () => {
   const payments = await Payment.find();
   const usage = {};
   payments.forEach(p => {
-    usage[p.method] = (usage[p.method] || 0) + 1;
+    const method = p.paymentMethod;
+    usage[method] = (usage[method] || 0) + 1;
   });
   return { methods: Object.entries(usage).map(([method, count]) => ({ method, count })) };
 };
@@ -89,16 +109,27 @@ const getTotalTaxCollected = async () => {
 };
 
 const getCartSubtotal = async (cartId) => {
-  const cart = await ShoppingCart.findById(cartId).populate('items');
-  const subtotal = cart.items.reduce((acc, item) => acc + item.subtotal, 0);
+  const cart = await ShoppingCart.findById(cartId);
+  if (!cart || !cart.product) return { subtotal: 0 };
+
+  const subtotal = cart.product.reduce((acc, item) => {
+    return acc + (item.price * item.quantity);
+  }, 0);
+
   return { subtotal };
 };
 
 const getOrderProductCount = async (orderId) => {
-  const order = await Order.findById(orderId).populate('items');
-  const count = order.items.reduce((sum, i) => sum + i.quantity, 0);
+  const order = await Order.findById(orderId);
+  if (!order || !order.products) return { count: 0 };
+
+  const productStr = String(order.products);
+  const count = productStr.split(',').length;
+
   return { count };
 };
+
+
 
 const getAverageOrderValue = async () => {
   const orders = await Order.find();
@@ -139,35 +170,71 @@ const getLowStockProducts = async () => {
 };
 
 const getProductSalesHistory = async (productId) => {
-  const items = await CartItem.find({ product: productId }).populate('shoppingCart');
+  const items = await CartItem.find({ product: productId });
+
   const monthlySales = {};
   items.forEach(item => {
-    const date = new Date(item.shoppingCart.createdAt);
+    if (!item.createdAt) return; 
+
+    const date = new Date(item.createdAt);
     const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+
     monthlySales[key] = (monthlySales[key] || 0) + item.quantity;
   });
-  return Object.entries(monthlySales).map(([month, sold]) => ({ month, sold }));
+
+  return Object.entries(monthlySales)
+    .map(([month, sold]) => ({ month, sold }))
+    .sort((a, b) => a.month.localeCompare(b.month));
 };
+
 
 const getOrderStatusHistory = async (orderId) => {
   const order = await Order.findById(orderId);
-  return order.statusHistory || [];
+  return order.status || [];
 };
 
-const getDailySummary = async (dateStr) => {
-  const date = new Date(dateStr);
+const getDailySummary = async (dateStr = new Date().toISOString().slice(0, 10)) => {
+  console.log("📅 dateStr recibido:", dateStr);
+
+  if (!dateStr || typeof dateStr !== 'string') {
+    throw new Error('Fecha faltante o inválida');
+  }
+
+  const normalizeDateInput = (str) => {
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(str)) {
+      const [d, m, y] = str.split('/');
+      return `${y}-${m}-${d}`;
+    }
+    return str;
+  };
+
+  const date = new Date(normalizeDateInput(dateStr));
+  if (isNaN(date.getTime())) {
+    throw new Error('Fecha inválida. Usa formato YYYY-MM-DD o DD/MM/YYYY.');
+  }
+
   const next = new Date(date);
   next.setDate(date.getDate() + 1);
 
   const orders = await Order.find({ date: { $gte: date, $lt: next } });
+
   const totalSales = orders.reduce((s, o) => s + o.total, 0);
-  const productsSold = orders.reduce((s, o) => s + o.items.reduce((a, i) => a + i.quantity, 0), 0);
+
+  const productsSold = orders.reduce((s, o) => {
+    const numProducts = o.products
+      ? String(o.products).split(',').filter(p => p.trim() !== '').length
+      : 0;
+    return s + numProducts;
+  }, 0);
+
   return {
     orders: orders.length,
     sales: totalSales,
     productsSold
   };
 };
+
+
 
 module.exports = {
   getTotalSales,
