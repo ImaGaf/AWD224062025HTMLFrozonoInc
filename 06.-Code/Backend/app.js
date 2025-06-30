@@ -18,6 +18,7 @@ app.use("/api/categories", require("./routes/categoryRoutes"));
 app.use("/api/customers", require("./routes/customerRoutes"));
 app.use("/api/orders", require("./routes/orderRoutes"));
 app.use("/api/cart-items", require("./routes/cartItemRoutes"));
+app.use("/api/stats", require('./routes/statsRoutes'));
 
 
 app.get("/", (req, res) => {
