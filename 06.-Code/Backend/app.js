@@ -9,15 +9,16 @@ connectDB();
 
 app.use(express.json());
 
-app.use("/api/administrators", require("./routes/administratorRoutes"));
-app.use("/api/employees", require("./routes/employeeRoutes"));
-app.use("/api/products", require("./routes/productRoutes"));
-app.use("/api/users", require("./routes/userRoutes"));
-app.use("/api/payments", require("./routes/paymentRoutes"));
-app.use("/api/categories", require("./routes/categoryRoutes"));
-app.use("/api/customers", require("./routes/customerRoutes"));
-app.use("/api/orders", require("./routes/orderRoutes"));
-app.use("/api/cart-items", require("./routes/cartItemRoutes"));
+app.use("/barroco/administrators", require("./routes/administratorRoutes"));
+app.use("/barroco/employees", require("./routes/employeeRoutes"));
+app.use("/barroco/products", require("./routes/productRoutes"));
+app.use("/barroco/users", require("./routes/userRoutes"));
+app.use("/barroco/payments", require("./routes/paymentRoutes"));
+app.use("/barroco/categories", require("./routes/categoryRoutes"));
+app.use("/barroco/customers", require("./routes/customerRoutes"));
+app.use("/barroco/orders", require("./routes/orderRoutes"));
+app.use("/barroco/cart-items", require("./routes/cartItemRoutes"));
+app.use("/barroco/stats", require('./routes/statsRoutes'));
 
 
 app.get("/", (req, res) => {
