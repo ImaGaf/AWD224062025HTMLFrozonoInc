@@ -21,6 +21,6 @@ router.get('/product/:id/stock-status', statsController.getProductStockStatus);
 router.get('/product/low-stock', statsController.getLowStockProducts);
 router.get('/product/:id/sales-history', statsController.getProductSalesHistory);
 router.get('/order/:id/status-history', statsController.getOrderStatusHistory);
-router.get('/reports/dailySummary', statsController.getDailySummary); 
+router.get('/reports/daily-summary', statsController.getDailySummary); 
 
 module.exports = router;
