@@ -19,6 +19,8 @@ app.use("/barroco/customers", require("./routes/customerRoutes"));
 app.use("/barroco/orders", require("./routes/orderRoutes"));
 app.use("/barroco/cart-items", require("./routes/cartItemRoutes"));
 app.use("/barroco/stats", require('./routes/statsRoutes'));
+app.use("/barroco/invoices", require('./routes/invoiceRoutes'));
+app.use("/barroco/shoppingCart", require('./routes/shoppingCartRoutes'));
 
 
 app.get("/", (req, res) => {
