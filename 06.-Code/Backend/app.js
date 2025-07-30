@@ -14,6 +14,8 @@ const corsOptions = {
 
 connectDB();
 
+
+app.use(cors(corsOptions));         
 app.use(express.json());
 
 app.use("/barroco/administrators", require("./routes/administratorRoutes"));
@@ -28,7 +30,6 @@ app.use("/barroco/cart-items", require("./routes/cartItemRoutes"));
 app.use("/barroco/stats", require('./routes/statsRoutes'));
 app.use("/barroco/invoices", require('./routes/invoiceRoutes'));
 app.use("/barroco/shoppingCart", require('./routes/shoppingCartRoutes'));
-
 
 app.get("/", (req, res) => {
   res.send("API RESTful de Barroco funcionando correctamente");
