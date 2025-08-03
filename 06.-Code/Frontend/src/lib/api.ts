@@ -89,6 +89,7 @@ export const employeeAPI = {
   getById: (id: string) => api(`/employees/${id}`),
   update: (id: string, data: any) => api(`/employees/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   delete: (id: string) => api(`/employees/${id}`, { method: 'DELETE' }),
+  getAll: () => api('/employees'),
 };
 
 // Stats API
