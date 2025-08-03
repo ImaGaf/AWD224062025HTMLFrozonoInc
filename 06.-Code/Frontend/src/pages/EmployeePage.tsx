@@ -1,14 +1,31 @@
-// Parte 1: Mostrar lista básica de empleados
-
 import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { employeeAPI } from "@/lib/api";
 
 export default function EmployeePage() {
   const { toast } = useToast();
   const [employees, setEmployees] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const [newEmployee, setNewEmployee] = useState({
+    idEmployee: "",
+    idUser: "",
+    role: "",
+    idAdmin: "",
+  });
+
+  const roles = [
+    { label: "Vendedor", value: "Ventas" },
+    { label: "Atención al Cliente", value: "Atención al Cliente" },
+    { label: "Jefe de Producción", value: "Jefe de Producción" },
+    { label: "Encargado de Almacén", value: "Almacén" },
+  ];
 
   const fetchEmployees = async () => {
     try {
@@ -27,6 +44,29 @@ export default function EmployeePage() {
     fetchEmployees();
   }, []);
 
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      await employeeAPI.create(newEmployee);
+      toast({
+        title: "Empleado creado",
+        description: "Se ha registrado el empleado correctamente",
+      });
+      setNewEmployee({ idEmployee: "", idUser: "", role: "", idAdmin: "" });
+      fetchEmployees();
+    } catch {
+      toast({
+        title: "Error",
+        description: "No se pudo crear el empleado",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen p-6 bg-gray-100">
       <Card className="max-w-2xl mx-auto">
@@ -34,8 +74,59 @@ export default function EmployeePage() {
           <CardTitle>Gestión de Empleados</CardTitle>
         </CardHeader>
         <CardContent>
+          {/* Formulario para crear empleado */}
+          <form onSubmit={handleCreate} className="space-y-4 mb-8">
+            <div>
+              <Label>ID Empleado</Label>
+              <Input
+                value={newEmployee.idEmployee}
+                onChange={(e) => setNewEmployee({ ...newEmployee, idEmployee: e.target.value })}
+                required
+              />
+            </div>
+            <div>
+              <Label>ID Usuario</Label>
+              <Input
+                value={newEmployee.idUser}
+                onChange={(e) => setNewEmployee({ ...newEmployee, idUser: e.target.value })}
+                required
+              />
+            </div>
+            <div>
+              <Label>Rol</Label>
+              <Select
+                value={newEmployee.role}
+                onValueChange={(value) => setNewEmployee({ ...newEmployee, role: value })}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Selecciona un rol" />
+                </SelectTrigger>
+                <SelectContent>
+                  {roles.map((role) => (
+                    <SelectItem key={role.value} value={role.value}>
+                      {role.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>ID Administrador</Label>
+              <Input
+                value={newEmployee.idAdmin}
+                onChange={(e) => setNewEmployee({ ...newEmployee, idAdmin: e.target.value })}
+                required
+              />
+            </div>
+            <Button type="submit" disabled={loading}>
+              {loading ? "Creando..." : "Crear Empleado"}
+            </Button>
+          </form>
+
+          <Separator className="my-6" />
+
+          {/* Lista de empleados */}
           <h2 className="text-lg font-semibold mb-4">Lista de Empleados</h2>
-          <Separator className="mb-4" />
           {employees.length > 0 ? (
             <ul className="space-y-2">
               {employees.map((emp) => (
