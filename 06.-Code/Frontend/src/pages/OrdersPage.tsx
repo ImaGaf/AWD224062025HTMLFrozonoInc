@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { orderAPI } from "@/lib/api";
 
@@ -8,6 +9,7 @@ export default function OrdersPage() {
   const { toast } = useToast();
   const [orders, setOrders] = useState<any[]>([]);
   const [search, setSearch] = useState("");
+  const [editingOrder, setEditingOrder] = useState<{ id: string; status: string } | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchOrders = async () => {
@@ -30,7 +32,25 @@ export default function OrdersPage() {
     fetchOrders();
   }, []);
 
-  // Filtro por texto
+  const handleUpdate = async () => {
+    if (!editingOrder) return;
+    try {
+      await orderAPI.update(editingOrder.id, { status: editingOrder.status });
+      toast({
+        title: "Orden actualizada",
+        description: "El estatus ha sido modificado correctamente",
+      });
+      setEditingOrder(null);
+      fetchOrders();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "No se pudo actualizar la orden",
+        variant: "destructive",
+      });
+    }
+  };
+
   const filteredOrders = orders.filter((order) => {
     const idOrder = order.idOrder?.toLowerCase() || "";
     const products = order.products?.toLowerCase() || "";
@@ -55,7 +75,6 @@ export default function OrdersPage() {
           <CardTitle className="text-2xl font-bold">Gestión de Órdenes</CardTitle>
         </CardHeader>
         <CardContent>
-          {/* Buscador */}
           <div className="mb-6">
             <Input
               type="text"
@@ -65,7 +84,6 @@ export default function OrdersPage() {
             />
           </div>
 
-          {/* Lista filtrada */}
           {filteredOrders.length > 0 ? (
             <ul className="space-y-4">
               {filteredOrders.map((order) => {
@@ -82,6 +100,51 @@ export default function OrdersPage() {
                     <p><strong>Fecha:</strong> {formattedDate}</p>
                     <p><strong>Cliente:</strong> {order.customer || "Sin cliente"}</p>
                     <p><strong>Estatus:</strong> {order.status || "Desconocido"}</p>
+
+                    <Button
+                      variant="outline"
+                      className="mt-2"
+                      onClick={() =>
+                        setEditingOrder({
+                          id: order._id || order.idOrder,
+                          status: order.status || "En proceso",
+                        })
+                      }
+                    >
+                      Editar Estatus
+                    </Button>
+
+                    {editingOrder?.id === (order._id || order.idOrder) && (
+                      <div className="mt-4 p-3 border rounded-md bg-muted">
+                        <h3 className="text-sm font-semibold mb-2">Actualizar Estatus</h3>
+                        <select
+                          className="border p-2 rounded-md w-full"
+                          value={editingOrder.status}
+                          onChange={(e) =>
+                            setEditingOrder({ ...editingOrder, status: e.target.value })
+                          }
+                        >
+                          <option value="En proceso">En proceso</option>
+                          <option value="Entregado">Entregado</option>
+                          <option value="Cancelado">Cancelado</option>
+                        </select>
+
+                        <div className="flex gap-2 mt-3">
+                          <Button
+                            className="bg-ceramics hover:bg-ceramics/90 text-ceramics-foreground"
+                            onClick={handleUpdate}
+                          >
+                            Guardar cambios
+                          </Button>
+                          <Button
+                            variant="secondary"
+                            onClick={() => setEditingOrder(null)}
+                          >
+                            Cancelar
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                   </li>
                 );
               })}
