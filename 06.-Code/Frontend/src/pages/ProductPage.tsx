@@ -77,7 +77,12 @@ export default function ProductPage() {
           {filteredProducts.length > 0 ? (
             <ul className="space-y-3">
               {filteredProducts.map((product) => (
-                <li key={product._id} className="border p-4 rounded-md">
+                <li
+                  key={product._id}
+                  className={`border p-4 rounded-md ${
+                    product.stock === 0 ? "border-red-500 bg-red-100" : ""
+                  }`}
+                >
                   <div className="flex gap-4">
                     {product.url && (
                       <img
@@ -94,7 +99,7 @@ export default function ProductPage() {
                       <p><strong>Precio:</strong> ${product.price}</p>
                       <p>
                         <strong>Stock:</strong>{" "}
-                        <span className={product.stock === 0 ? "text-red-500 font-bold" : ""}>
+                        <span className={product.stock === 0 ? "text-red-600 font-bold" : ""}>
                           {product.stock}
                         </span>
                       </p>
