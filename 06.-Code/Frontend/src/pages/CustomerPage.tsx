@@ -37,6 +37,25 @@ export default function CustomerPage() {
     }
   };
 
+  const handleUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editCustomer?._id) return;
+    setLoading(true);
+    try {
+      await customerAPI.update(editCustomer._id, {
+        phone: editCustomer.phone,
+        billingAddress: editCustomer.billingAddress,
+      });
+      toast({ title: "Cliente actualizado", description: "Datos modificados correctamente" });
+      setEditCustomer(null);
+      fetchCustomers();
+    } catch (error) {
+      toast({ title: "Error", description: "No se pudo actualizar el cliente", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleDelete = async (id: string) => {
     if (!confirm("¿Seguro que deseas eliminar este cliente?")) return;
     try {
@@ -57,6 +76,35 @@ export default function CustomerPage() {
         </CardHeader>
         <CardContent>
 
+          {/* Editar Cliente */}
+          {editCustomer && (
+            <form onSubmit={handleUpdate} className="space-y-4">
+              <h2 className="font-bold">Editar Cliente</h2>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Teléfono</Label>
+                  <Input
+                    value={editCustomer.phone}
+                    onChange={(e) => setEditCustomer({ ...editCustomer, phone: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label>Dirección de Facturación</Label>
+                  <Input
+                    value={editCustomer.billingAddress}
+                    onChange={(e) => setEditCustomer({ ...editCustomer, billingAddress: e.target.value })}
+                  />
+                </div>
+              </div>
+              <Button type="submit" className="bg-ceramics text-ceramics-foreground" disabled={loading}>
+                {loading ? "Actualizando..." : "Actualizar Cliente"}
+              </Button>
+              <Button type="button" variant="outline" onClick={() => setEditCustomer(null)}>Cancelar</Button>
+            </form>
+          )}
+
+          <Separator className="my-6" />
+
           {/* Lista de Clientes */}
           <h2 className="font-bold">Lista de Clientes</h2>
           <ul className="space-y-2 mt-4">
@@ -68,6 +116,7 @@ export default function CustomerPage() {
                   <p><strong>Dirección:</strong> {c.billingAddress}</p>
                 </div>
                 <div className="space-x-2">
+                  <Button size="sm" onClick={() => setEditCustomer(c)}>Edtar</Button>
                   <Button size="sm" variant="destructive" onClick={() => handleDelete(c._id!)}>Eliminar</Button>
                 </div>
               </li>
