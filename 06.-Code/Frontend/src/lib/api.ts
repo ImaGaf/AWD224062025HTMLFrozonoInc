@@ -54,6 +54,7 @@ export const cartItemAPI = {
 // Order API
 export const orderAPI = {
   create: (data: any) => api('/orders', { method: 'POST', body: JSON.stringify(data) }),
+  getAll: () => api('/orders'),
   getById: (id: string) => api(`/orders/${id}`),
   update: (id: string, data: any) => api(`/orders/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   delete: (id: string) => api(`/orders/${id}`, { method: 'DELETE' }),
