@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { orderAPI } from "@/lib/api";
 
 export default function OrdersPage() {
   const { toast } = useToast();
   const [orders, setOrders] = useState<any[]>([]);
+  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
 
   const fetchOrders = async () => {
@@ -28,6 +30,16 @@ export default function OrdersPage() {
     fetchOrders();
   }, []);
 
+  // Filtro por texto
+  const filteredOrders = orders.filter((order) => {
+    const idOrder = order.idOrder?.toLowerCase() || "";
+    const products = order.products?.toLowerCase() || "";
+    return (
+      idOrder.includes(search.toLowerCase()) ||
+      products.includes(search.toLowerCase())
+    );
+  });
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -43,9 +55,20 @@ export default function OrdersPage() {
           <CardTitle className="text-2xl font-bold">Gestión de Órdenes</CardTitle>
         </CardHeader>
         <CardContent>
-          {orders.length > 0 ? (
+          {/* Buscador */}
+          <div className="mb-6">
+            <Input
+              type="text"
+              placeholder="Buscar por ID o producto..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+
+          {/* Lista filtrada */}
+          {filteredOrders.length > 0 ? (
             <ul className="space-y-4">
-              {orders.map((order) => {
+              {filteredOrders.map((order) => {
                 const formattedDate = order.date
                   ? new Date(order.date).toLocaleDateString()
                   : "Sin fecha";
@@ -64,7 +87,7 @@ export default function OrdersPage() {
               })}
             </ul>
           ) : (
-            <p className="text-muted-foreground">No hay órdenes registradas</p>
+            <p className="text-muted-foreground">No se encontraron órdenes</p>
           )}
         </CardContent>
       </Card>
