@@ -20,6 +20,8 @@ export default function EmployeePage() {
     idAdmin: "",
   });
 
+  const [editingEmployee, setEditingEmployee] = useState<{ id: string; role: string } | null>(null);
+
   const roles = [
     { label: "Vendedor", value: "Ventas" },
     { label: "Atención al Cliente", value: "Atención al Cliente" },
@@ -50,20 +52,26 @@ export default function EmployeePage() {
 
     try {
       await employeeAPI.create(newEmployee);
-      toast({
-        title: "Empleado creado",
-        description: "Se ha registrado el empleado correctamente",
-      });
+      toast({ title: "Empleado creado", description: "Se ha registrado el empleado correctamente" });
       setNewEmployee({ idEmployee: "", idUser: "", role: "", idAdmin: "" });
       fetchEmployees();
     } catch {
-      toast({
-        title: "Error",
-        description: "No se pudo crear el empleado",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: "No se pudo crear el empleado", variant: "destructive" });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleUpdate = async () => {
+    if (!editingEmployee) return;
+
+    try {
+      await employeeAPI.update(editingEmployee.id, { role: editingEmployee.role });
+      toast({ title: "Empleado actualizado", description: "El rol fue modificado correctamente" });
+      setEditingEmployee(null);
+      fetchEmployees();
+    } catch {
+      toast({ title: "Error", description: "No se pudo actualizar el empleado", variant: "destructive" });
     }
   };
 
@@ -128,12 +136,51 @@ export default function EmployeePage() {
           {/* Lista de empleados */}
           <h2 className="text-lg font-semibold mb-4">Lista de Empleados</h2>
           {employees.length > 0 ? (
-            <ul className="space-y-2">
+            <ul className="space-y-4">
               {employees.map((emp) => (
                 <li key={emp._id} className="border p-3 rounded-md">
-                  <p><strong>ID:</strong> {emp.idEmployee}</p>
-                  <p><strong>Rol:</strong> {emp.role}</p>
-                  <p><strong>ID Admin:</strong> {emp.idAdmin}</p>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p><strong>ID:</strong> {emp.idEmployee}</p>
+                      <p><strong>Rol:</strong> {emp.role}</p>
+                      <p><strong>ID Admin:</strong> {emp.idAdmin}</p>
+                    </div>
+                    <Button
+                      variant="outline"
+                      onClick={() => setEditingEmployee({ id: emp._id, role: emp.role })}
+                    >
+                      Editar
+                    </Button>
+                  </div>
+
+                  {editingEmployee?.id === emp._id && (
+                    <div className="mt-4 bg-gray-50 p-3 rounded-md border">
+                      <Label>Nuevo Rol</Label>
+                      <Select
+                        value={editingEmployee.role}
+                        onValueChange={(value) =>
+                          setEditingEmployee({ ...editingEmployee, role: value })
+                        }
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Selecciona un nuevo rol" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {roles.map((role) => (
+                            <SelectItem key={role.value} value={role.value}>
+                              {role.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <div className="flex gap-2 mt-3">
+                        <Button onClick={handleUpdate}>Guardar cambios</Button>
+                        <Button variant="secondary" onClick={() => setEditingEmployee(null)}>
+                          Cancelar
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </li>
               ))}
             </ul>
