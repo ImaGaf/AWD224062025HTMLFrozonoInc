@@ -22,6 +22,7 @@ export default function EmployeePage() {
 
   const [editingEmployee, setEditingEmployee] = useState<{ id: string; role: string } | null>(null);
 
+  // Lista de roles
   const roles = [
     { label: "Vendedor", value: "Ventas" },
     { label: "Atención al Cliente", value: "Atención al Cliente" },
@@ -62,9 +63,18 @@ export default function EmployeePage() {
     }
   };
 
+  const handleDelete = async (id: string) => {
+    try {
+      await employeeAPI.delete(id);
+      toast({ title: "Empleado eliminado", description: "El empleado ha sido eliminado correctamente" });
+      fetchEmployees();
+    } catch {
+      toast({ title: "Error", description: "No se pudo eliminar el empleado", variant: "destructive" });
+    }
+  };
+
   const handleUpdate = async () => {
     if (!editingEmployee) return;
-
     try {
       await employeeAPI.update(editingEmployee.id, { role: editingEmployee.role });
       toast({ title: "Empleado actualizado", description: "El rol fue modificado correctamente" });
@@ -76,15 +86,15 @@ export default function EmployeePage() {
   };
 
   return (
-    <div className="min-h-screen p-6 bg-gray-100">
-      <Card className="max-w-2xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-cornsilk via-warm to-accent p-6">
+      <Card className="max-w-2xl mx-auto bg-card/95 backdrop-blur">
         <CardHeader>
-          <CardTitle>Gestión de Empleados</CardTitle>
+          <CardTitle className="text-2xl font-bold">Gestión de Empleados</CardTitle>
         </CardHeader>
         <CardContent>
-          {/* Formulario para crear empleado */}
-          <form onSubmit={handleCreate} className="space-y-4 mb-8">
-            <div>
+          {/* Formulario para crear empleados */}
+          <form onSubmit={handleCreate} className="space-y-4">
+            <div className="space-y-2">
               <Label>ID Empleado</Label>
               <Input
                 value={newEmployee.idEmployee}
@@ -92,7 +102,8 @@ export default function EmployeePage() {
                 required
               />
             </div>
-            <div>
+
+            <div className="space-y-2">
               <Label>ID Usuario</Label>
               <Input
                 value={newEmployee.idUser}
@@ -100,7 +111,8 @@ export default function EmployeePage() {
                 required
               />
             </div>
-            <div>
+
+            <div className="space-y-2">
               <Label>Rol</Label>
               <Select
                 value={newEmployee.role}
@@ -118,7 +130,8 @@ export default function EmployeePage() {
                 </SelectContent>
               </Select>
             </div>
-            <div>
+
+            <div className="space-y-2">
               <Label>ID Administrador</Label>
               <Input
                 value={newEmployee.idAdmin}
@@ -126,7 +139,8 @@ export default function EmployeePage() {
                 required
               />
             </div>
-            <Button type="submit" disabled={loading}>
+
+            <Button type="submit" className="w-full bg-ceramics hover:bg-ceramics/90 text-ceramics-foreground" disabled={loading}>
               {loading ? "Creando..." : "Crear Empleado"}
             </Button>
           </form>
@@ -136,31 +150,33 @@ export default function EmployeePage() {
           {/* Lista de empleados */}
           <h2 className="text-lg font-semibold mb-4">Lista de Empleados</h2>
           {employees.length > 0 ? (
-            <ul className="space-y-4">
+            <ul className="space-y-2">
               {employees.map((emp) => (
                 <li key={emp._id} className="border p-3 rounded-md">
+                  {/* Información principal del empleado */}
                   <div className="flex justify-between items-center">
                     <div>
                       <p><strong>ID:</strong> {emp.idEmployee}</p>
                       <p><strong>Rol:</strong> {emp.role}</p>
                       <p><strong>ID Admin:</strong> {emp.idAdmin}</p>
                     </div>
-                    <Button
-                      variant="outline"
-                      onClick={() => setEditingEmployee({ id: emp._id, role: emp.role })}
-                    >
-                      Editar
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button variant="outline" onClick={() => setEditingEmployee({ id: emp._id, role: emp.role })}>
+                        Editar
+                      </Button>
+                      <Button variant="destructive" onClick={() => handleDelete(emp._id)}>
+                        Eliminar
+                      </Button>
+                    </div>
                   </div>
 
+                  {/* Edición debajo del empleado seleccionado */}
                   {editingEmployee?.id === emp._id && (
-                    <div className="mt-4 bg-gray-50 p-3 rounded-md border">
-                      <Label>Nuevo Rol</Label>
+                    <div className="mt-4 p-3 border rounded-md bg-muted">
+                      <h3 className="text-sm font-semibold mb-2">Actualizar Rol</h3>
                       <Select
                         value={editingEmployee.role}
-                        onValueChange={(value) =>
-                          setEditingEmployee({ ...editingEmployee, role: value })
-                        }
+                        onValueChange={(value) => setEditingEmployee({ ...editingEmployee, role: value })}
                       >
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Selecciona un nuevo rol" />
@@ -174,7 +190,9 @@ export default function EmployeePage() {
                         </SelectContent>
                       </Select>
                       <div className="flex gap-2 mt-3">
-                        <Button onClick={handleUpdate}>Guardar cambios</Button>
+                        <Button className="bg-ceramics hover:bg-ceramics/90 text-ceramics-foreground" onClick={handleUpdate}>
+                          Guardar cambios
+                        </Button>
                         <Button variant="secondary" onClick={() => setEditingEmployee(null)}>
                           Cancelar
                         </Button>
