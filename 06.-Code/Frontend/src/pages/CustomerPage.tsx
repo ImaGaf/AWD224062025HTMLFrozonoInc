@@ -37,6 +37,26 @@ export default function CustomerPage() {
     }
   };
 
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const data = {
+        idCustomer: `CUST_${Date.now()}`,
+        phone: newCustomer.phone,
+        billingAddress: newCustomer.billingAddress,
+      };
+      await customerAPI.create(data);
+      toast({ title: "Cliente creado", description: "El cliente fue registrado correctamente" });
+      setNewCustomer({ phone: "", billingAddress: "" });
+      fetchCustomers();
+    } catch (error) {
+      toast({ title: "Error", description: "No se pudo crear el cliente", variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editCustomer?._id) return;
@@ -67,6 +87,19 @@ export default function CustomerPage() {
     }
   };
 
+  const handleSearch = async () => {
+    if (!searchId.trim()) return;
+    try {
+      const data = await customerAPI.getById(searchId);
+      if (data.message) {
+        toast({ title: "No encontrado", description: "Cliente no existe", variant: "destructive" });
+      } else {
+        setCustomers([data]);
+      }
+    } catch {
+      toast({ title: "Error", description: "No se pudo buscar el cliente", variant: "destructive" });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-cornsilk via-warm to-accent p-6">
@@ -75,6 +108,33 @@ export default function CustomerPage() {
           <CardTitle className="text-2xl text-center">Gestión de Clientes</CardTitle>
         </CardHeader>
         <CardContent>
+          {/* Crear Cliente */}
+          <form onSubmit={handleCreate} className="space-y-4">
+            <h2 className="font-bold">Crear Cliente</h2>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>Teléfono</Label>
+                <Input
+                  value={newCustomer.phone}
+                  onChange={(e) => setNewCustomer({ ...newCustomer, phone: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <Label>Dirección de Facturación</Label>
+                <Input
+                  value={newCustomer.billingAddress}
+                  onChange={(e) => setNewCustomer({ ...newCustomer, billingAddress: e.target.value })}
+                  required
+                />
+              </div>
+            </div>
+            <Button type="submit" className="bg-ceramics text-ceramics-foreground" disabled={loading}>
+              {loading ? "Creando..." : "Crear Cliente"}
+            </Button>
+          </form>
+
+          <Separator className="my-6" />
 
           {/* Editar Cliente */}
           {editCustomer && (
@@ -105,6 +165,19 @@ export default function CustomerPage() {
 
           <Separator className="my-6" />
 
+          {/* Buscar Cliente */}
+          <div className="flex space-x-2">
+            <Input
+              placeholder="Buscar por ID"
+              value={searchId}
+              onChange={(e) => setSearchId(e.target.value)}
+            />
+            <Button onClick={handleSearch}>Buscar</Button>
+            <Button variant="outline" onClick={fetchCustomers}>Ver Todos</Button>
+          </div>
+
+          <Separator className="my-6" />
+
           {/* Lista de Clientes */}
           <h2 className="font-bold">Lista de Clientes</h2>
           <ul className="space-y-2 mt-4">
@@ -116,13 +189,12 @@ export default function CustomerPage() {
                   <p><strong>Dirección:</strong> {c.billingAddress}</p>
                 </div>
                 <div className="space-x-2">
-                  <Button size="sm" onClick={() => setEditCustomer(c)}>Edtar</Button>
+                  <Button size="sm" onClick={() => setEditCustomer(c)}>Editar</Button>
                   <Button size="sm" variant="destructive" onClick={() => handleDelete(c._id!)}>Eliminar</Button>
                 </div>
               </li>
             ))}
           </ul>
-          
         </CardContent>
       </Card>
     </div>
