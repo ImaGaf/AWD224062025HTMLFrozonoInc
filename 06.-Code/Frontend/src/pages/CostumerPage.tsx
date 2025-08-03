@@ -67,7 +67,9 @@ export default function CustomerPage() {
                   <p><strong>Teléfono:</strong> {c.phone}</p>
                   <p><strong>Dirección:</strong> {c.billingAddress}</p>
                 </div>
-
+                <div className="space-x-2">
+                  <Button size="sm" variant="destructive" onClick={() => handleDelete(c._id!)}>Eliminar</Button>
+                </div>
               </li>
             ))}
           </ul>
