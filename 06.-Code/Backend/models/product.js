@@ -8,7 +8,8 @@ const productSchema = new mongoose.Schema({
   stock: Number,
   category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category' },  
   custom: Boolean,
-  updatedAt: Date
+  updatedAt: Date,
+  url: String  // <-- Agrega esta línea para incluir url
 }, {
   collection: 'products'
 });
