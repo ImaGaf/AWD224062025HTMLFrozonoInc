@@ -15,7 +15,7 @@ export default function ProductPage() {
   const fetchProducts = async () => {
     try {
       const data = await productAPI.getAll();
-      setProducts(data);
+      setProducts(data as any[]);
     } catch {
       toast({
         title: "Error",
