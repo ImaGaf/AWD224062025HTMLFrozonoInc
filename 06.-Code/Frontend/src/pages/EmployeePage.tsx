@@ -12,14 +12,21 @@ export default function EmployeePage() {
   const { toast } = useToast();
   const [employees, setEmployees] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  
 
-  const [newEmployee, setNewEmployee] = useState({
+  // Datos para crear un nuevo empleado
+  /*const [newEmployee, setNewEmployee] = useState({
     idEmployee: "",
     idUser: "",
     role: "",
     idAdmin: "",
-  });
+  });*/
 
+  // Estado para buscar un empleado//
+  const [searchId, setSearchId] = useState("");
+  const [searchedEmployee, setSearchedEmployee] = useState<any | null>(null);
+
+  // Estado para editar un empleado (por ID y rol)
   const [editingEmployee, setEditingEmployee] = useState<{ id: string; role: string } | null>(null);
 
   // Lista de roles
@@ -30,6 +37,7 @@ export default function EmployeePage() {
     { label: "Encargado de Almacén", value: "Almacén" },
   ];
 
+  // Obtener empleados
   const fetchEmployees = async () => {
     try {
       const data = await employeeAPI.getAll();
@@ -47,7 +55,25 @@ export default function EmployeePage() {
     fetchEmployees();
   }, []);
 
-  const handleCreate = async (e: React.FormEvent) => {
+  // Buscar empleado por ID
+  const handleSearch = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setSearchedEmployee(null);
+
+  if (!searchId.trim()) return;
+
+  try {
+    const result = await employeeAPI.getById(searchId.trim());
+    setSearchedEmployee(result);
+    toast({ title: "Empleado encontrado", description: `Se cargaron los datos del empleado ${result._id}` });
+  } catch (error) {
+    console.error("Error al buscar empleado:", error);
+    toast({ title: "Error", description: "Empleado no encontrado", variant: "destructive" });
+  }
+};
+
+  // Crear empleado
+  /*const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
@@ -61,8 +87,9 @@ export default function EmployeePage() {
     } finally {
       setLoading(false);
     }
-  };
+  };*/
 
+  // Eliminar empleado
   const handleDelete = async (id: string) => {
     try {
       await employeeAPI.delete(id);
@@ -73,6 +100,7 @@ export default function EmployeePage() {
     }
   };
 
+  // Actualizar rol de empleado
   const handleUpdate = async () => {
     if (!editingEmployee) return;
     try {
@@ -93,7 +121,7 @@ export default function EmployeePage() {
         </CardHeader>
         <CardContent>
           {/* Formulario para crear empleados */}
-          <form onSubmit={handleCreate} className="space-y-4">
+          {/*<form onSubmit={handleCreate} className="space-y-4">
             <div className="space-y-2">
               <Label>ID Empleado</Label>
               <Input
@@ -102,6 +130,7 @@ export default function EmployeePage() {
                 required
               />
             </div>
+            
 
             <div className="space-y-2">
               <Label>ID Usuario</Label>
@@ -143,7 +172,32 @@ export default function EmployeePage() {
             <Button type="submit" className="w-full bg-ceramics hover:bg-ceramics/90 text-ceramics-foreground" disabled={loading}>
               {loading ? "Creando..." : "Crear Empleado"}
             </Button>
+          </form>*/}
+
+          {/* Buscador por ID */}
+          <form onSubmit={handleSearch} className="space-y-4 mb-6">
+            <div className="space-y-2">
+              <Label>Buscar Empleado por ID</Label>
+              <Input
+                placeholder="Ingresa el _id del empleado"
+                value={searchId}
+                onChange={(e) => setSearchId(e.target.value)}
+              />
+            </div>
+            <Button type="submit" className="w-full bg-ceramics hover:bg-ceramics/90 text-ceramics-foreground">
+              Buscar
+            </Button>
           </form>
+
+          {/* Resultado de la búsqueda */}
+          {searchedEmployee && (
+            <div className="border p-4 rounded-md bg-muted mb-6">
+              <h3 className="text-lg font-semibold mb-2">Resultado de la Búsqueda</h3>
+              <p><strong>ID Empleado:</strong> {searchedEmployee.idEmployee || searchedEmployee._id || "No disponible"}</p>
+              <p><strong>ID Usuario:</strong> {searchedEmployee.idUser || "No disponible"}</p>
+              <p><strong>Rol:</strong> {searchedEmployee.role || "No asignado"}</p>
+            </div>
+          )}
 
           <Separator className="my-6" />
 
@@ -156,9 +210,10 @@ export default function EmployeePage() {
                   {/* Información principal del empleado */}
                   <div className="flex justify-between items-center">
                     <div>
-                      <p><strong>ID:</strong> {emp.idEmployee}</p>
-                      <p><strong>Rol:</strong> {emp.role}</p>
-                      <p><strong>ID Admin:</strong> {emp.idAdmin}</p>
+                      <p><strong>ID Empleado:</strong> {emp.idEmployee || emp._id || "No disponible"}</p>
+                      <p><strong>ID Usuario:</strong> {emp.idUser || "No disponible"}</p>
+                      <p><strong>Rol:</strong> {emp.role || "No asignado"}</p>
+                      {/*<p><strong>ID Admin:</strong> {emp.idAdmin || "No disponible"}</p> funciona pero esta en revision*/}
                     </div>
                     <div className="flex gap-2">
                       <Button variant="outline" onClick={() => setEditingEmployee({ id: emp._id, role: emp.role })}>
