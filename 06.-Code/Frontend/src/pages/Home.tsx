@@ -32,7 +32,7 @@ export default function Home() {
               Crea Piezas <span className="text-ceramics">Únicas</span> de Cerámica
             </h1>
             <p className="text-lg lg:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Descubre nuestra colección de cerámicas artesanales hechas a mano. 
+              Descubre nuestra colección de cerámicas artesanales hechas a mano.
               Personaliza cada pieza según tu estilo y convierte tu hogar en un espacio especial.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -104,12 +104,24 @@ export default function Home() {
               <Card key={product.idProduct || index} className="group cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
                 <CardHeader className="p-0">
                   <div className="aspect-square bg-gradient-to-br from-accent to-warm rounded-t-lg relative overflow-hidden">
-                    <div className="absolute inset-0 bg-ceramics/20 flex items-center justify-center">
-                      <span className="text-4xl">🏺</span>
-                    </div>
-                    <Badge className="absolute top-3 left-3 bg-primary">
-                      Artesanal
-                    </Badge>
+                    {product.url ? (
+                      <img
+                        src={product.url || "https://via.placeholder.com/400x300?text=Sin+Imagen"}
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src =
+                            "https://via.placeholder.com/400x300?text=Sin+Imagen";
+                        }}
+                      />
+                    ) : (
+                      <div className="absolute inset-0 bg-ceramics/20 flex items-center justify-center">
+                        <span className="text-4xl">🏺</span>
+                      </div>
+                    )}
+
+                    <Badge className="absolute top-3 left-3 bg-primary">Artesanal</Badge>
+
                     {product.customizationAvailable && (
                       <Badge variant="secondary" className="absolute top-3 right-3">
                         Personalizable
@@ -117,6 +129,7 @@ export default function Home() {
                     )}
                   </div>
                 </CardHeader>
+
                 <CardContent className="p-4">
                   <div className="flex items-center mb-2">
                     <div className="flex text-yellow-400">
@@ -167,7 +180,7 @@ export default function Home() {
               ¿Tienes una Idea Especial?
             </h2>
             <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Trabajamos contigo para crear piezas únicas que reflejen tu personalidad. 
+              Trabajamos contigo para crear piezas únicas que reflejen tu personalidad.
               Desde colores hasta formas, cada detalle puede ser personalizado.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
