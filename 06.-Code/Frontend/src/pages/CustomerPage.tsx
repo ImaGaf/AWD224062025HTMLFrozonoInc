@@ -2,199 +2,203 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { customerAPI } from "@/lib/api";
 
-interface Customer {
-  _id?: string;
-  idCustomer?: string;
-  phone: string;
-  billingAddress: string;
-  __v?: number;
-}
-
-export default function CustomerPage() {
+export default function CustomersPage() {
   const { toast } = useToast();
-  const [customers, setCustomers] = useState<Customer[]>([]);
-  const [newCustomer, setNewCustomer] = useState({ phone: "", billingAddress: "" });
-  const [editCustomer, setEditCustomer] = useState<Customer | null>(null);
-  const [searchId, setSearchId] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  // Cargar todos los clientes
+  // Estado para crear un nuevo cliente
+  const [newCustomer, setNewCustomer] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    phone: "",
+    billingAddress: "",
+    shippingAddress: "",
+    role: "customer",
+  });
+
+  // Estados para actualizar un cliente
+  const [editCustomerId, setEditCustomerId] = useState<string | null>(null);
+  const [editCustomer, setEditCustomer] = useState({
+    phone: "",
+    billingAddress: "",
+    shippingAddress: "",
+  });
+
+  // Obtener todos los clientes
+  const fetchCustomers = async () => {
+    try {
+      const data = await customerAPI.getAll();
+      setCustomers(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Error al obtener clientes:", error);
+      toast({
+        title: "Error",
+        description: "No se pudieron cargar los clientes",
+        variant: "destructive",
+      });
+    }
+  };
+
   useEffect(() => {
     fetchCustomers();
   }, []);
 
-  const fetchCustomers = async () => {
+  // Crear cliente
+  const handleCreate = async () => {
     try {
-      const data = await customerAPI.getAll();
-      setCustomers(data);
-    } catch (error) {
-      toast({ title: "Error", description: "No se pudieron obtener los clientes", variant: "destructive" });
-    }
-  };
-
-  const handleCreate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const data = {
-        idCustomer: `CUST_${Date.now()}`,
-        phone: newCustomer.phone,
-        billingAddress: newCustomer.billingAddress,
-      };
-      await customerAPI.create(data);
-      toast({ title: "Cliente creado", description: "El cliente fue registrado correctamente" });
-      setNewCustomer({ phone: "", billingAddress: "" });
-      fetchCustomers();
-    } catch (error) {
-      toast({ title: "Error", description: "No se pudo crear el cliente", variant: "destructive" });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!editCustomer?._id) return;
-    setLoading(true);
-    try {
-      await customerAPI.update(editCustomer._id, {
-        phone: editCustomer.phone,
-        billingAddress: editCustomer.billingAddress,
+      await customerAPI.create(newCustomer);
+      toast({
+        title: "Cliente creado",
+        description: "El cliente ha sido registrado correctamente",
       });
-      toast({ title: "Cliente actualizado", description: "Datos modificados correctamente" });
-      setEditCustomer(null);
+
+      // Resetear formulario
+      setNewCustomer({
+        firstName: "",
+        lastName: "",
+        email: "",
+        password: "",
+        phone: "",
+        billingAddress: "",
+        shippingAddress: "",
+        role: "customer",
+      });
+
       fetchCustomers();
     } catch (error) {
-      toast({ title: "Error", description: "No se pudo actualizar el cliente", variant: "destructive" });
-    } finally {
-      setLoading(false);
+      console.error("Error al crear cliente:", error);
+      toast({
+        title: "Error",
+        description: "No se pudo crear el cliente",
+        variant: "destructive",
+      });
     }
   };
 
+  // Actualizar cliente
+  const handleUpdate = async (id: string) => {
+    try {
+      await customerAPI.update(id, editCustomer);
+      toast({
+        title: "Cliente actualizado",
+        description: "Los datos del cliente fueron modificados correctamente",
+      });
+      setEditCustomerId(null);
+      fetchCustomers();
+    } catch (error) {
+      console.error("Error al actualizar cliente:", error);
+      toast({
+        title: "Error",
+        description: "No se pudo actualizar el cliente",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Eliminar cliente
   const handleDelete = async (id: string) => {
-    if (!confirm("¿Seguro que deseas eliminar este cliente?")) return;
     try {
       await customerAPI.delete(id);
-      toast({ title: "Cliente eliminado", description: "El cliente fue eliminado correctamente" });
+      toast({
+        title: "Cliente eliminado",
+        description: "El cliente ha sido eliminado correctamente",
+      });
       fetchCustomers();
     } catch (error) {
-      toast({ title: "Error", description: "No se pudo eliminar el cliente", variant: "destructive" });
+      console.error("Error al eliminar cliente:", error);
+      toast({
+        title: "Error",
+        description: "No se pudo eliminar el cliente",
+        variant: "destructive",
+      });
     }
   };
 
-  const handleSearch = async () => {
-    if (!searchId.trim()) return;
-    try {
-      const data = await customerAPI.getById(searchId);
-      if (data.message) {
-        toast({ title: "No encontrado", description: "Cliente no existe", variant: "destructive" });
-      } else {
-        setCustomers([data]);
-      }
-    } catch {
-      toast({ title: "Error", description: "No se pudo buscar el cliente", variant: "destructive" });
-    }
-  };
+  // Filtrar clientes por búsqueda
+  const filteredCustomers = customers.filter((c) => {
+    const term = searchTerm.toLowerCase();
+    return (
+      c._id?.toLowerCase().includes(term) ||
+      c.firstName?.toLowerCase().includes(term) ||
+      c.lastName?.toLowerCase().includes(term) ||
+      c.email?.toLowerCase().includes(term)
+    );
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-cornsilk via-warm to-accent p-6">
-      <Card className="max-w-4xl mx-auto">
+      <Card className="max-w-5xl mx-auto bg-card/95 backdrop-blur">
         <CardHeader>
-          <CardTitle className="text-2xl text-center">Gestión de Clientes</CardTitle>
+          <CardTitle className="text-2xl font-bold">Gestión de Clientes</CardTitle>
         </CardHeader>
         <CardContent>
-          {/* Crear Cliente */}
-          <form onSubmit={handleCreate} className="space-y-4">
-            <h2 className="font-bold">Crear Cliente</h2>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>Teléfono</Label>
-                <Input
-                  value={newCustomer.phone}
-                  onChange={(e) => setNewCustomer({ ...newCustomer, phone: e.target.value })}
-                  required
-                />
-              </div>
-              <div>
-                <Label>Dirección de Facturación</Label>
-                <Input
-                  value={newCustomer.billingAddress}
-                  onChange={(e) => setNewCustomer({ ...newCustomer, billingAddress: e.target.value })}
-                  required
-                />
-              </div>
-            </div>
-            <Button type="submit" className="bg-ceramics text-ceramics-foreground" disabled={loading}>
-              {loading ? "Creando..." : "Crear Cliente"}
-            </Button>
-          </form>
-
-          <Separator className="my-6" />
-
-          {/* Editar Cliente */}
-          {editCustomer && (
-            <form onSubmit={handleUpdate} className="space-y-4">
-              <h2 className="font-bold">Editar Cliente</h2>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>Teléfono</Label>
-                  <Input
-                    value={editCustomer.phone}
-                    onChange={(e) => setEditCustomer({ ...editCustomer, phone: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <Label>Dirección de Facturación</Label>
-                  <Input
-                    value={editCustomer.billingAddress}
-                    onChange={(e) => setEditCustomer({ ...editCustomer, billingAddress: e.target.value })}
-                  />
-                </div>
-              </div>
-              <Button type="submit" className="bg-ceramics text-ceramics-foreground" disabled={loading}>
-                {loading ? "Actualizando..." : "Actualizar Cliente"}
-              </Button>
-              <Button type="button" variant="outline" onClick={() => setEditCustomer(null)}>Cancelar</Button>
-            </form>
-          )}
-
-          <Separator className="my-6" />
-
-          {/* Buscar Cliente */}
-          <div className="flex space-x-2">
-            <Input
-              placeholder="Buscar por ID"
-              value={searchId}
-              onChange={(e) => setSearchId(e.target.value)}
-            />
-            <Button onClick={handleSearch}>Buscar</Button>
-            <Button variant="outline" onClick={fetchCustomers}>Ver Todos</Button>
+          {/* Formulario de creación */}
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <Input placeholder="Nombre" value={newCustomer.firstName} onChange={(e) => setNewCustomer({ ...newCustomer, firstName: e.target.value })} />
+            <Input placeholder="Apellido" value={newCustomer.lastName} onChange={(e) => setNewCustomer({ ...newCustomer, lastName: e.target.value })} />
+            <Input type="email" placeholder="Correo" value={newCustomer.email} onChange={(e) => setNewCustomer({ ...newCustomer, email: e.target.value })} />
+            <Input type="password" placeholder="Contraseña" value={newCustomer.password} onChange={(e) => setNewCustomer({ ...newCustomer, password: e.target.value })} />
+            <Input type="tel" placeholder="Teléfono" value={newCustomer.phone} onChange={(e) => setNewCustomer({ ...newCustomer, phone: e.target.value })} />
+            <Input placeholder="Dirección de facturación" value={newCustomer.billingAddress} onChange={(e) => setNewCustomer({ ...newCustomer, billingAddress: e.target.value })} />
+            <Input placeholder="Dirección de envío" value={newCustomer.shippingAddress} onChange={(e) => setNewCustomer({ ...newCustomer, shippingAddress: e.target.value })} />
           </div>
 
+          <Button className="w-full bg-ceramics hover:bg-ceramics/90 text-ceramics-foreground" onClick={handleCreate}>
+            Crear Cliente
+          </Button>
+
           <Separator className="my-6" />
 
-          {/* Lista de Clientes */}
-          <h2 className="font-bold">Lista de Clientes</h2>
-          <ul className="space-y-2 mt-4">
-            {customers.map((c) => (
-              <li key={c._id} className="flex justify-between items-center p-2 border rounded-lg">
-                <div>
+          {/* Barra de búsqueda */}
+          <Input placeholder="Buscar cliente por ID, nombre o email" className="mb-4" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+
+          {/* Lista de clientes */}
+          {filteredCustomers.length > 0 ? (
+            <ul className="space-y-3">
+              {filteredCustomers.map((c) => (
+                <li key={c._id} className="border p-4 rounded-md">
                   <p><strong>ID:</strong> {c._id}</p>
+                  <p><strong>Nombre:</strong> {c.firstName} {c.lastName}</p>
+                  <p><strong>Email:</strong> {c.email}</p>
                   <p><strong>Teléfono:</strong> {c.phone}</p>
-                  <p><strong>Dirección:</strong> {c.billingAddress}</p>
-                </div>
-                <div className="space-x-2">
-                  <Button size="sm" onClick={() => setEditCustomer(c)}>Editar</Button>
-                  <Button size="sm" variant="destructive" onClick={() => handleDelete(c._id!)}>Eliminar</Button>
-                </div>
-              </li>
-            ))}
-          </ul>
+                  <p><strong>Facturación:</strong> {c.billingAddress}</p>
+                  <p><strong>Envío:</strong> {c.shippingAddress}</p>
+                  <p><strong>Rol:</strong> {c.role}</p>
+
+                  <div className="flex gap-2 mt-3">
+                    <Button size="sm" onClick={() => {
+                      setEditCustomerId(c._id);
+                      setEditCustomer({ phone: c.phone, billingAddress: c.billingAddress, shippingAddress: c.shippingAddress });
+                    }}>
+                      Editar
+                    </Button>
+                    <Button size="sm" variant="destructive" onClick={() => handleDelete(c._id)}>
+                      Eliminar
+                    </Button>
+                  </div>
+
+                  {/* Formulario de actualización */}
+                  {editCustomerId === c._id && (
+                    <div className="mt-3 p-3 border rounded bg-muted">
+                      <Input placeholder="Teléfono" value={editCustomer.phone} onChange={(e) => setEditCustomer({ ...editCustomer, phone: e.target.value })} />
+                      <Input placeholder="Dirección de facturación" value={editCustomer.billingAddress} onChange={(e) => setEditCustomer({ ...editCustomer, billingAddress: e.target.value })} className="mt-2" />
+                      <Input placeholder="Dirección de envío" value={editCustomer.shippingAddress} onChange={(e) => setEditCustomer({ ...editCustomer, shippingAddress: e.target.value })} className="mt-2" />
+                      <Button className="mt-2" onClick={() => handleUpdate(c._id)}>Guardar Cambios</Button>
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-muted-foreground">No se encontraron clientes</p>
+          )}
         </CardContent>
       </Card>
     </div>
