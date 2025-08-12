@@ -3,13 +3,14 @@ import { ShoppingCart, User, Search, Menu, Heart } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cartStore } from "@/lib/cart-store";
-
+import { getCurrentUser, logoutUser } from "@/lib/api";
 interface LayoutProps {
   children: React.ReactNode;
 }
 
 export function Layout({ children }: LayoutProps) {
   const [cartCount, setCartCount] = useState(0);
+  const [user, setUser] = useState<any | null>(null);
   const location = useLocation();
 
   useEffect(() => {
@@ -21,6 +22,10 @@ export function Layout({ children }: LayoutProps) {
     const unsubscribe = cartStore.subscribe(updateCartCount);
     return unsubscribe;
   }, []);
+
+  useEffect(() => {
+    setUser(getCurrentUser());
+  }, [location.pathname]);
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -51,12 +56,6 @@ export function Layout({ children }: LayoutProps) {
                 className={`text-sm font-medium transition-colors hover:text-primary ${isActive('/productos') ? 'text-primary' : 'text-muted-foreground'}`}
               >
                 Productos
-              </Link>
-              <Link 
-                to="/categorias" 
-                className={`text-sm font-medium transition-colors hover:text-primary ${isActive('/categorias') ? 'text-primary' : 'text-muted-foreground'}`}
-              >
-                Categorías
               </Link>
               <Link 
                 to="/personalizar" 
@@ -91,11 +90,32 @@ export function Layout({ children }: LayoutProps) {
               </Link>
 
               {/* User */}
-              <Link to="/login">
-                <Button variant="ghost" size="icon">
-                  <User className="h-4 w-4" />
-                </Button>
-              </Link>
+              {user ? (
+                <div className="flex items-center space-x-2">
+                  <Link
+                    to={user.role === "customer" ? "/perfil" : user.role === "admin" ? "/Admin" : "/empleados"}
+                    className="text-sm font-medium text-foreground"
+                  >
+                    Hola, {user.firstName || user.email}
+                  </Link>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      logoutUser();
+                      window.location.href = "/";
+                    }}
+                  >
+                    Salir
+                  </Button>
+                </div>
+              ) : (
+                <Link to="/login">
+                  <Button variant="ghost" size="icon">
+                    <User className="h-4 w-4" />
+                  </Button>
+                </Link>
+              )}
 
               {/* Mobile menu */}
               <Button variant="ghost" size="icon" className="md:hidden">

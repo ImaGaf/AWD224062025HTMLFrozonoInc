@@ -5,12 +5,15 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { cartStore } from "@/lib/cart-store";
+import { getCurrentUser } from "@/lib/api";
+import { upsertCartForCurrentUser, loadCartForCurrentUser } from "@/lib/cart-sync";
 
 export default function Cart() {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [cartItems, setCartItems] = useState(cartStore.getItems());
 
   useEffect(() => {
@@ -20,6 +23,9 @@ export default function Cart() {
 
     updateCart();
     const unsubscribe = cartStore.subscribe(updateCart);
+
+    // Intentamos cargar el carrito del backend si existe uno previo
+    loadCartForCurrentUser().catch(() => {});
     return unsubscribe;
   }, []);
 
@@ -53,7 +59,7 @@ export default function Cart() {
     return '🏺'; // default
   };
 
-  const proceedToCheckout = () => {
+  const proceedToCheckout = async () => {
     if (cartItems.length === 0) {
       toast({
         title: "Carrito vacío",
@@ -63,10 +69,26 @@ export default function Cart() {
       return;
     }
 
+    const user = getCurrentUser();
+    if (!user || user?.role !== "customer") {
+      toast({
+        title: "Requiere inicio de sesión",
+        description: "Inicia sesión como cliente para continuar con el pago",
+        variant: "destructive",
+      });
+      navigate("/login");
+      return;
+    }
+
     toast({
       title: "Procesando pedido...",
-      description: "Redirigiendo al checkout",
+      description: "Guardando tu carrito y redirigiendo al checkout",
     });
+
+    // Guardamos/actualizamos el carrito en el backend
+    await upsertCartForCurrentUser().catch(() => {});
+
+    navigate("/checkout");
   };
 
   return (

@@ -44,10 +44,10 @@ export default function Auth() {
         description: `Bienvenido, ${user.firstName || user.email}`,
       });
 
-      localStorage.setItem("user", JSON.stringify(user));
+      sessionStorage.setItem("user", JSON.stringify(user));
 
       if (user.role === "admin") {
-        window.location.href = "/dashboardadmin";
+        window.location.href = "/Admin";
       } else if (user.role === "employee") {
         window.location.href = "/empleados";
       } else {

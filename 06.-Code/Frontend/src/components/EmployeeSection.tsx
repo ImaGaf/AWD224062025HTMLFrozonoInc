@@ -25,7 +25,7 @@ const EmployeeSection = () => {
 
   const fetchEmployees = async () => {
     try {
-      const data = await employeeAPI.getAll();
+      const data = await employeeAPI.getAll() as any[];
       // Mapeamos para guardar también _id
       setEmployees(
         data.map((emp: any) => ({

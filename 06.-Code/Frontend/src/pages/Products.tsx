@@ -71,12 +71,14 @@ export default function Products() {
       price: product.price || 29.99,
       quantity: 1,
     };
-
+    
     cartStore.addItem(cartItem);
+    sessionStorage.setItem("cart", JSON.stringify(cartStore.getItems()));
 
     toast({
       title: "Producto agregado",
       description: `${product.name} se ha añadido al carrito`,
+
     });
   };
 
@@ -266,8 +268,8 @@ export default function Products() {
                       product.stock > 10
                         ? "default"
                         : product.stock > 0
-                        ? "secondary"
-                        : "destructive"
+                          ? "secondary"
+                          : "destructive"
                     }
                     className="px-3 py-1"
                   >

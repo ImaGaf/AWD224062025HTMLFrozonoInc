@@ -36,7 +36,7 @@ export default function UsersSection() {
 
   const fetchUsers = async () => {
     try {
-      const data = await customerAPI.getAll();
+      const data = await customerAPI.getAll() as any[];
       setUsers(
         data.map((u: any) => ({
           mongoId: u._id, // ID real de Mongo
