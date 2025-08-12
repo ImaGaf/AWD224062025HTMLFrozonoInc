@@ -47,11 +47,11 @@ export default function Auth() {
       sessionStorage.setItem("user", JSON.stringify(user));
 
       if (user.role === "admin") {
-        window.location.href = "/Admin";
+        window.location.href = "/admin";
       } else if (user.role === "employee") {
         window.location.href = "/empleados";
       } else {
-        window.location.href = "/productos";
+        window.location.href = "/";
       }
 
     } catch (error: any) {

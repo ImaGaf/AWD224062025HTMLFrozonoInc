@@ -142,7 +142,7 @@ export const invoiceAPI = {
 // Login API
 export const LoginAPI = {
   login: async (email: string, password: string) => {
-    const adminsRaw = await adminAPI.getById("all").catch(() => []);
+    const adminsRaw = await adminAPI.getAll().catch(() => []);
     const employeesRaw = await employeeAPI.getAll().catch(() => []);
     const customersRaw = await customerAPI.getAll().catch(() => []);
 
