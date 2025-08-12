@@ -60,59 +60,108 @@ export default function Profile() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <header className="mb-6">
-        <h1 className="text-2xl font-bold">Mi perfil</h1>
-        <p className="text-muted-foreground text-sm">Actualiza tu información personal y de envío.</p>
+    <div className="container mx-auto px-6 py-10">
+      <header className="mb-8 text-center">
+        <h1 className="text-3xl font-bold text-gray-800">Mi perfil</h1>
+        <p className="text-gray-500 text-sm mt-2">
+          Actualiza tu información personal y de envío.
+        </p>
       </header>
 
-      <Card className="max-w-2xl">
-        <CardHeader>
-          <CardTitle>Información del cliente</CardTitle>
+      <Card className="max-w-5xl mx-auto rounded-2xl shadow-md border border-gray-200 bg-[#ececec]">
+        <CardHeader className="pb-4 border-b border-gray-200">
+          <CardTitle className="text-lg font-semibold text-gray-800">
+            Información del cliente
+          </CardTitle>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+        <CardContent className="pt-6">
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Columna izquierda */}
+            <div className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="firstName">Nombre</Label>
-                <Input id="firstName" value={form.firstName} onChange={(e) => setForm((p) => ({ ...p, firstName: e.target.value }))} />
+                <Label htmlFor="firstName" className="text-gray-700 font-medium">Nombre</Label>
+                <Input
+                  id="firstName"
+                  value={form.firstName}
+                  onChange={(e) => setForm((p) => ({ ...p, firstName: e.target.value }))}
+                  className="rounded-xl border-gray-300 focus:border-[#E7A97C] focus:ring-[#E7A97C]"
+                />
               </div>
+
               <div className="space-y-2">
-                <Label htmlFor="lastName">Apellido</Label>
-                <Input id="lastName" value={form.lastName} onChange={(e) => setForm((p) => ({ ...p, lastName: e.target.value }))} />
+                <Label htmlFor="lastName" className="text-gray-700 font-medium">Apellido</Label>
+                <Input
+                  id="lastName"
+                  value={form.lastName}
+                  onChange={(e) => setForm((p) => ({ ...p, lastName: e.target.value }))}
+                  className="rounded-xl border-gray-300 focus:border-[#E7A97C] focus:ring-[#E7A97C]"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-gray-700 font-medium">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
+                  className="rounded-xl border-gray-300 focus:border-[#E7A97C] focus:ring-[#E7A97C]"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="phone" className="text-gray-700 font-medium">Teléfono</Label>
+                <Input
+                  id="phone"
+                  value={form.phone}
+                  onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))}
+                  className="rounded-xl border-gray-300 focus:border-[#E7A97C] focus:ring-[#E7A97C]"
+                />
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" value={form.email} onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))} />
-            </div>
+            {/* Columna derecha */}
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="billingAddress" className="text-gray-700 font-medium">
+                  Dirección de facturación
+                </Label>
+                <Input
+                  id="billingAddress"
+                  value={form.billingAddress}
+                  onChange={(e) => setForm((p) => ({ ...p, billingAddress: e.target.value }))}
+                  className="rounded-xl border-gray-300 focus:border-[#E7A97C] focus:ring-[#E7A97C]"
+                />
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="phone">Teléfono</Label>
-              <Input id="phone" value={form.phone} onChange={(e) => setForm((p) => ({ ...p, phone: e.target.value }))} />
-            </div>
+              <div className="space-y-2">
+                <Label htmlFor="shippingAddress" className="text-gray-700 font-medium">
+                  Dirección de envío
+                </Label>
+                <Input
+                  id="shippingAddress"
+                  value={form.shippingAddress}
+                  onChange={(e) => setForm((p) => ({ ...p, shippingAddress: e.target.value }))}
+                  className="rounded-xl border-gray-300 focus:border-[#E7A97C] focus:ring-[#E7A97C]"
+                />
+              </div>
 
-            <Separator />
-
-            <div className="space-y-2">
-              <Label htmlFor="billingAddress">Dirección de facturación</Label>
-              <Input id="billingAddress" value={form.billingAddress} onChange={(e) => setForm((p) => ({ ...p, billingAddress: e.target.value }))} />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="shippingAddress">Dirección de envío</Label>
-              <Input id="shippingAddress" value={form.shippingAddress} onChange={(e) => setForm((p) => ({ ...p, shippingAddress: e.target.value }))} />
-            </div>
-
-            <div className="flex justify-end">
-              <Button type="submit" disabled={isSaving}>
-                {isSaving ? "Guardando..." : "Guardar cambios"}
-              </Button>
+              <div className="flex justify-center pt-6">
+                <Button
+                  type="submit"
+                  disabled={isSaving}
+                  className="bg-[#E7A97C] hover:bg-[#d98a60] text-white rounded-xl px-6 py-2"
+                >
+                  {isSaving ? "Guardando..." : "Guardar cambios"}
+                </Button>
+              </div>
             </div>
           </form>
         </CardContent>
       </Card>
     </div>
   );
+
+
 }

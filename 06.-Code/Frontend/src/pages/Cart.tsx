@@ -23,23 +23,22 @@ export default function Cart() {
 
     updateCart();
     const unsubscribe = cartStore.subscribe(updateCart);
-
-    // Intentamos cargar el carrito del backend si existe uno previo
-    loadCartForCurrentUser().catch(() => {});
+    loadCartForCurrentUser().catch(() => { });
     return unsubscribe;
   }, []);
 
-  const updateQuantity = (id: string, newQuantity: number) => {
+  const updateQuantity = async (id: string, newQuantity: number) => {
     if (newQuantity === 0) {
-      removeItem(id);
+      await removeItem(id);
       return;
     }
-
     cartStore.updateQuantity(id, newQuantity);
+    await upsertCartForCurrentUser();
   };
 
-  const removeItem = (id: string) => {
+  const removeItem = async (id: string) => {
     cartStore.removeItem(id);
+    await upsertCartForCurrentUser();
     toast({
       title: "Producto eliminado",
       description: "El producto ha sido eliminado del carrito",
@@ -86,7 +85,7 @@ export default function Cart() {
     });
 
     // Guardamos/actualizamos el carrito en el backend
-    await upsertCartForCurrentUser().catch(() => {});
+    await upsertCartForCurrentUser().catch(() => { });
 
     navigate("/checkout");
   };
@@ -133,7 +132,7 @@ export default function Cart() {
             {/* Cart Items */}
             <div className="lg:col-span-2 space-y-4">
               <h2 className="text-xl font-semibold mb-4">Productos en tu carrito</h2>
-              
+
               {cartItems.map((item) => (
                 <Card key={item.id}>
                   <CardContent className="p-6">
@@ -156,7 +155,7 @@ export default function Cart() {
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
-                        
+
                         <div className="text-2xl font-bold text-ceramics mb-3">
                           ${item.price.toFixed(2)}
                         </div>
@@ -203,7 +202,7 @@ export default function Cart() {
                               </Button>
                             </div>
                           </div>
-                          
+
                           <div className="text-lg font-semibold">
                             ${(item.price * item.quantity).toFixed(2)}
                           </div>
@@ -241,7 +240,7 @@ export default function Cart() {
                       <span>Impuestos</span>
                       <span>${tax.toFixed(2)}</span>
                     </div>
-                    
+
                     {shipping === 0 && (
                       <div className="text-sm text-green-600 bg-green-50 p-2 rounded">
                         🎉 ¡Envío gratuito en pedidos mayores a $50!
@@ -256,7 +255,7 @@ export default function Cart() {
                     <span className="text-ceramics">${total.toFixed(2)}</span>
                   </div>
 
-                  <Button 
+                  <Button
                     className="w-full bg-ceramics hover:bg-ceramics/90 text-ceramics-foreground"
                     onClick={proceedToCheckout}
                   >

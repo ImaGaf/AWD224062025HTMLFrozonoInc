@@ -32,28 +32,45 @@ function buildPayload() {
   } as any;
 }
 
+interface ShoppingCartResponse {
+  idShoppingCar?: string | number;
+  _id?: string | number;
+  id?: string | number;
+}
+
+function extractCartId(data: ShoppingCartResponse | null | undefined): string | null {
+  const id = data?.idShoppingCar ?? data?._id ?? data?.id;
+  return id ? String(id) : null;
+}
+
 export async function upsertCartForCurrentUser(): Promise<string | null> {
   const user = getCurrentUser();
   const customer = getCustomerIdentifier(user);
+  console.log("Usuario:", user, "Customer:", customer);
   if (!customer) return null;
 
   const payload = buildPayload();
+  console.log("Payload enviado:", payload);
+
   const existingId = sessionStorage.getItem(SHOPPING_CART_ID_KEY);
+  console.log("Carrito existente:", existingId);
 
   try {
     if (existingId) {
       const updated: any = await cartAPI.update(existingId, payload);
+      console.log("Respuesta update:", updated);
       const id = updated?.idShoppingCar || updated?._id || existingId;
       sessionStorage.setItem(SHOPPING_CART_ID_KEY, String(id));
       return String(id);
     } else {
       const created: any = await cartAPI.create(payload);
+      console.log("Respuesta create:", created);
       const id = created?.idShoppingCar || created?._id || created?.id;
       if (id) sessionStorage.setItem(SHOPPING_CART_ID_KEY, String(id));
       return id ? String(id) : null;
     }
   } catch (e) {
-    // Silencioso, el backend podría no estar listo
+    console.error("Error al guardar carrito:", e);
     return existingId ?? null;
   }
 }

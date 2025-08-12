@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs';
+import { loadCartForCurrentUser } from './cart-sync';
 
 const BASE_URL = 'https://awd224062025htmlfrozonoinc.onrender.com/barroco';
 
@@ -8,6 +9,7 @@ async function api<T>(endpoint: string, options?: RequestInit): Promise<T> {
       'Content-Type': 'application/json',
       ...options?.headers,
     },
+    credentials: 'include',
     ...options,
   });
 
@@ -164,6 +166,11 @@ export const LoginAPI = {
 
     // Guardar sesión
     sessionStorage.setItem("user", JSON.stringify(user));
+    
+    
+    if (user.role === "customer") {
+      await loadCartForCurrentUser();
+    }
 
     return user;
   },
