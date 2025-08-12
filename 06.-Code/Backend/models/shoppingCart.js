@@ -1,22 +1,30 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
+import AutoIncrementFactory from "mongoose-sequence";
 
-const ProductSchema = new mongoose.Schema({
-  idProduct: { type: String, required: true },
-  quantity: { type: Number, required: true },
-  price: { type: Number, required: true }
-}, {
-  timestamps: true,
-  collection: "products"
-});
+const AutoIncrement = AutoIncrementFactory(mongoose);
 
-const ShoppingCartSchema = new mongoose.Schema({
-  idShoppingCar: { type: String, required: true, unique: true },
-  customer: { type: String, required: true },
-  product: [ProductSchema],
-  total: { type: Number, required: true }
-}, {
-  timestamps: true,
-  collection: "shoppingcart"
-});
+const shoppingCartSchema = new mongoose.Schema({
+  idShoppingCart: {
+    type: Number,
+    unique: true
+  },
+  customer: {
+    type: String,
+    required: true
+  },
+  products: [
+    {
+      idProduct: { type: String, required: true }, 
+      quantity: { type: Number, required: true, min: 1 },
+      price: { type: Number, required: true }
+    }
+  ],
+  total: {
+    type: Number,
+    required: true
+  }
+}, { timestamps: true });
 
-module.exports = mongoose.model('ShoppingCart', ShoppingCartSchema);
+shoppingCartSchema.plugin(AutoIncrement, { inc_field: "idShoppingCart" });
+
+export default mongoose.model("ShoppingCart", shoppingCartSchema);
