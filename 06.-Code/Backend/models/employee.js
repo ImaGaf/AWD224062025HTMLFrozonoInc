@@ -9,7 +9,7 @@ const employeeSchema = new mongoose.Schema({
   email:     { type: String, required: true, unique: true },
   password:  { type: String, required: true },
   role:      { type: String, default: "employee" },
-  idAdmin:   { type: Number }, // o mongoose.Schema.Types.ObjectId si quieres
+  idAdmin:   { type: Number }, 
 }, {
   collection: "employee",
   timestamps: true,
