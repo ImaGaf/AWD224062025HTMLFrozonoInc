@@ -41,7 +41,7 @@ export default function EmployeePage() {
   const fetchEmployees = async () => {
     try {
       const data = await employeeAPI.getAll();
-      setEmployees(data);
+      setEmployees(data as any[]);
     } catch {
       toast({
         title: "Error",
@@ -63,7 +63,7 @@ export default function EmployeePage() {
   if (!searchId.trim()) return;
 
   try {
-    const result = await employeeAPI.getById(searchId.trim());
+    const result = await employeeAPI.getById(searchId.trim()) as any;
     setSearchedEmployee(result);
     toast({ title: "Empleado encontrado", description: `Se cargaron los datos del empleado ${result._id}` });
   } catch (error) {
