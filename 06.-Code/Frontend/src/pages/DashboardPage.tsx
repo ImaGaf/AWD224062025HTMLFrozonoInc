@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-// Simulación de productAPI.getById (reemplázalo con tu import real)
 const productAPI = {
   getById: async (id: string) => {
     const res = await fetch(
