@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-import AutoIncrementFactory from "mongoose-sequence";
+const mongoose = require("mongoose");
+const AutoIncrementFactory = require("mongoose-sequence");
 
 const AutoIncrement = AutoIncrementFactory(mongoose);
 
@@ -25,6 +25,7 @@ const shoppingCartSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-shoppingCartSchema.plugin(AutoIncrement, { inc_field: "idShoppingCart" });
 
-export default mongoose.model("ShoppingCart", shoppingCartSchema);
+shoppingCartSchema.plugin(AutoIncrement, { inc_field: "idShoppingCart" });
+module.exports = mongoose.model("ShoppingCart", shoppingCartSchema);
+
