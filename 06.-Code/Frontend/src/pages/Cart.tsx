@@ -21,11 +21,14 @@ export default function Cart() {
       setCartItems([...cartStore.getItems()]);
     };
 
-    updateCart();
+    loadCartForCurrentUser()
+      .then(() => updateCart())
+      .catch(() => updateCart());
+
     const unsubscribe = cartStore.subscribe(updateCart);
-    loadCartForCurrentUser().catch(() => { });
     return unsubscribe;
   }, []);
+
 
   const updateQuantity = async (id: string, newQuantity: number) => {
     if (newQuantity === 0) {

@@ -28,9 +28,29 @@ export const getCurrentUser = (): any | null => {
 };
 
 export const logoutUser = async () => {
-  const { clearUserCart } = await import('./cart-sync');
-  await clearUserCart();
-  sessionStorage.removeItem("user");
+  try {
+    // Limpiar carrito
+    const { clearUserCart } = await import('./cart-sync');
+    await clearUserCart();
+    
+    // Limpiar todos los datos de sesión
+    sessionStorage.removeItem("user");
+    sessionStorage.removeItem("shoppingCartId");
+    sessionStorage.removeItem("cart");
+    
+    // Disparar evento personalizado para actualizar UI
+    window.dispatchEvent(new CustomEvent('userLogout'));
+    
+    console.log("Sesión cerrada exitosamente");
+  } catch (error) {
+    console.error("Error al cerrar sesión:", error);
+    // Aún así limpiar sessionStorage
+    sessionStorage.removeItem("user");
+    sessionStorage.removeItem("shoppingCartId");
+    sessionStorage.removeItem("cart");
+    
+    window.dispatchEvent(new CustomEvent('userLogout'));
+  }
 };
 
 // Customer API
@@ -144,61 +164,85 @@ export const invoiceAPI = {
 
 export const LoginAPI = {
   login: async (email: string, password: string) => {
-    const adminsRaw = await adminAPI.getAll().catch(() => []);
-    const employeesRaw = await employeeAPI.getAll().catch(() => []);
-    const customersRaw = await customerAPI.getAll().catch(() => []);
+    try {
+      const adminsRaw = await adminAPI.getAll().catch(() => []);
+      const employeesRaw = await employeeAPI.getAll().catch(() => []);
+      const customersRaw = await customerAPI.getAll().catch(() => []);
 
-    const admins = Array.isArray(adminsRaw) ? adminsRaw : [];
-    const employees = Array.isArray(employeesRaw) ? employeesRaw : [];
-    const customers = Array.isArray(customersRaw) ? customersRaw : [];
+      const admins = Array.isArray(adminsRaw) ? adminsRaw : [];
+      const employees = Array.isArray(employeesRaw) ? employeesRaw : [];
+      const customers = Array.isArray(customersRaw) ? customersRaw : [];
 
-    const allUsers = [
-      ...admins.map((u: any) => ({ ...u, role: "admin" })),
-      ...employees.map((u: any) => ({ ...u, role: "employee" })),
-      ...customers.map((u: any) => ({ ...u, role: "customer" })),
-    ];
+      const allUsers = [
+        ...admins.map((u: any) => ({ ...u, role: "admin" })),
+        ...employees.map((u: any) => ({ ...u, role: "employee" })),
+        ...customers.map((u: any) => ({ ...u, role: "customer" })),
+      ];
 
-    const user = allUsers.find((u: any) => u.email === email);
-    if (!user) throw new Error("Usuario no encontrado");
+      const user = allUsers.find((u: any) => u.email === email);
+      if (!user) throw new Error("Usuario no encontrado");
 
-    const passwordMatch = await bcrypt.compare(password, user.password);
-    if (!passwordMatch) throw new Error("Contraseña incorrecta");
+      const passwordMatch = await bcrypt.compare(password, user.password);
+      if (!passwordMatch) throw new Error("Contraseña incorrecta");
 
-    sessionStorage.removeItem("shoppingCartId");
-    sessionStorage.removeItem("cart");
+      // Limpiar datos de sesión anteriores
+      sessionStorage.removeItem("shoppingCartId");
+      sessionStorage.removeItem("cart");
 
-    sessionStorage.setItem("user", JSON.stringify(user));
-    
-    if (user.role === "customer") {
-      try {
-        console.log("Usuario customer logueado, cargando carrito existente...");
-        
-        const { loadCartForCurrentUser } = await import('./cart-sync');
-        
-        await loadCartForCurrentUser();
-        
-        console.log("Carrito del customer cargado exitosamente");
-      } catch (error) {
-        console.error("Error al cargar carrito del customer:", error);
+      // Guardar usuario en sessionStorage
+      sessionStorage.setItem("user", JSON.stringify(user));
+      
+      // Disparar evento personalizado para actualizar UI
+      window.dispatchEvent(new CustomEvent('userLogin', { detail: user }));
+
+      // Si es customer, cargar su carrito
+      if (user.role === "customer") {
+        try {
+          const { loadCartForCurrentUser } = await import('./cart-sync');
+          // Usar setTimeout para asegurar que el usuario esté guardado antes de cargar el carrito
+          setTimeout(async () => {
+            try {
+              await loadCartForCurrentUser();
+              console.log("Carrito cargado exitosamente");
+            } catch (error) {
+              console.error("Error al cargar carrito del customer:", error);
+            }
+          }, 100);
+        } catch (error) {
+          console.error("Error al importar cart-sync:", error);
+        }
       }
-    }
 
-    return user;
+      return user;
+    } catch (error) {
+      console.error("Error en login:", error);
+      throw error;
+    }
   },
 };
 
 export const RegisterAPI = {
   registerCustomer: async (data: any) => {
-    const user = await customerAPI.create({ ...data });
-    const userWithRole = { ...(typeof user === 'object' && user !== null ? user : {}), role: "customer" };
-    
-    sessionStorage.removeItem("shoppingCartId");
-    sessionStorage.removeItem("cart");
+    try {
+      const user = await customerAPI.create({ ...data });
+      const userWithRole = { ...(typeof user === 'object' && user !== null ? user : {}), role: "customer" };
+      
+      // Limpiar datos de sesión anteriores
+      sessionStorage.removeItem("shoppingCartId");
+      sessionStorage.removeItem("cart");
 
-    sessionStorage.setItem("user", JSON.stringify(userWithRole));
-    
-    console.log("Nuevo customer registrado, carrito se creará cuando sea necesario");
-    
-    return userWithRole;
+      // Guardar usuario
+      sessionStorage.setItem("user", JSON.stringify(userWithRole));
+      
+      // Disparar evento personalizado para actualizar UI
+      window.dispatchEvent(new CustomEvent('userLogin', { detail: userWithRole }));
+      
+      console.log("Nuevo customer registrado, carrito se creará cuando sea necesario");
+      
+      return userWithRole;
+    } catch (error) {
+      console.error("Error en registro:", error);
+      throw error;
+    }
   },
 };
