@@ -135,7 +135,22 @@ export default function CustomersPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-cornsilk via-warm to-accent p-6">
-      
+      {/* Sidebar fijo */}
+              <div className="w-60 bg-gray-800 text-white flex flex-col p-4">
+                <h2 className="text-lg font-bold mb-6">Menú</h2>
+                <Link to="/dashboard" className="mb-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded">
+                  Dashboard
+                </Link>
+                <Link to="/empleados" className="mb-2 bg-green-500 hover:bg-green-600 px-4 py-2 rounded">
+                  Empleados
+                </Link>
+                <Link to="/productoscontrol" className="mb-2 bg-yellow-500 hover:bg-yellow-600 px-4 py-2 rounded">
+                  Productos
+                </Link>
+                <Link to="/ordenpedidos" className="mb-2 bg-purple-500 hover:bg-purple-600 px-4 py-2 rounded">
+                  Ordenes
+                </Link>
+              </div>
       <Card className="max-w-5xl mx-auto bg-card/95 backdrop-blur">
         <CardHeader>
           <CardTitle className="text-2xl font-bold">Gestión de Clientes</CardTitle>
@@ -205,22 +220,6 @@ export default function CustomersPage() {
           )}
         </CardContent>
       </Card>
-      {/* Sidebar fijo */}
-              <div className="w-60 bg-gray-800 text-white flex flex-col p-4">
-                <h2 className="text-lg font-bold mb-6">Menú</h2>
-                <Link to="/dashboard" className="mb-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded">
-                  Dashboard
-                </Link>
-                <Link to="/empleados" className="mb-2 bg-green-500 hover:bg-green-600 px-4 py-2 rounded">
-                  Empleados
-                </Link>
-                <Link to="/productoscontrol" className="mb-2 bg-yellow-500 hover:bg-yellow-600 px-4 py-2 rounded">
-                  Productos
-                </Link>
-                <Link to="/ordenpedidos" className="mb-2 bg-purple-500 hover:bg-purple-600 px-4 py-2 rounded">
-                  Ordenes
-                </Link>
-              </div>
     </div>
   );
 }
