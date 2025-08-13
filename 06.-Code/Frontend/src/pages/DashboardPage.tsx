@@ -142,9 +142,11 @@ export default function Dashboard() {
 
           <div className="bg-white p-4 shadow rounded">
             <h3 className="font-semibold text-lg">Top Clientes</h3>
-            {topCustomers.map((c) => (
-              <p key={c.customerId}>
-                ID: {c.customerId} — <span className="font-bold">${c.totalSpent}</span>
+             {topCustomers.map((c) => (
+              <p key={c.idCustomer}>
+                ID: {c.idCustomer} —{" "}
+                Nombre: {c.firstName} {c.lastName} —{" "}
+                <span className="font-bold">${c.totalSpent}</span>
               </p>
             ))}
           </div>
