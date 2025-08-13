@@ -6,7 +6,10 @@ async function api<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const response = await fetch(`${BASE_URL}${endpoint}`, {
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Basic ${btoa("frozono:trabatrix2")}`,
+      'Authorization':     "Basic " +
+    btoa(
+      `${import.meta.env.VITE_API_USER}:${import.meta.env.VITE_API_PASS}`
+    ),
       ...options?.headers,
     },
     ...options,
