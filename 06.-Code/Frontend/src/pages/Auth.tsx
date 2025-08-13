@@ -10,8 +10,6 @@ import { customerAPI, RegisterAPI } from "@/lib/api";
 import { Link } from "react-router-dom";
 import { LoginAPI } from "@/lib/api";
 
-
-
 export default function Auth() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -44,13 +42,14 @@ export default function Auth() {
         description: `Bienvenido, ${user.firstName || user.email}`,
       });
 
-      sessionStorage.setItem("user", JSON.stringify(user));
-
+      // La información del usuario ya se guarda en LoginAPI.login
+      // Solo necesitamos redirigir según el rol
       if (user.role === "admin") {
         window.location.href = "/admin";
       } else if (user.role === "employee") {
-        window.location.href = "/Dashboard";
+        window.location.href = "/dashboard";
       } else {
+        // Customer va a la página principal
         window.location.href = "/";
       }
 
@@ -65,64 +64,64 @@ export default function Auth() {
     }
   };
 
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-const handleRegister = async (e: React.FormEvent) => {
-  e.preventDefault();
+    if (registerForm.password !== registerForm.confirmPassword) {
+      toast({
+        title: "Error",
+        description: "Las contraseñas no coinciden",
+        variant: "destructive",
+      });
+      return;
+    }
 
-  if (registerForm.password !== registerForm.confirmPassword) {
-    toast({
-      title: "Error",
-      description: "Las contraseñas no coinciden",
-      variant: "destructive",
-    });
-    return;
-  }
+    setIsLoading(true);
 
-  setIsLoading(true);
+    try {
+      const customerData = {
+        firstName: registerForm.firstName,
+        lastName: registerForm.lastName,
+        email: registerForm.email,
+        password: registerForm.password,
+        phone: registerForm.phone,
+        billingAddress: registerForm.billingAddress,
+        shippingAddress: registerForm.shippingAddress,
+      };
 
-  try {
-    const customerData = {
-      firstName: registerForm.firstName,
-      lastName: registerForm.lastName,
-      email: registerForm.email,
-      password: registerForm.password,
-      phone: registerForm.phone,
-      billingAddress: registerForm.billingAddress,
-      shippingAddress: registerForm.shippingAddress,
-    };
+      await RegisterAPI.registerCustomer(customerData);
 
-    await RegisterAPI.registerCustomer(customerData);
+      toast({
+        title: "Registro exitoso",
+        description: "Tu cuenta ha sido creada correctamente. Redirigiendo...",
+      });
 
-    toast({
-      title: "Registro exitoso",
-      description: "Tu cuenta ha sido creada correctamente",
-    });
+      setRegisterForm({
+        firstName: "",
+        lastName: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+        phone: "",
+        billingAddress: "",
+        shippingAddress: "",
+      });
 
-    setRegisterForm({
-      firstName: "",
-      lastName: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-      phone: "",
-      billingAddress: "",
-      shippingAddress: "",
-    });
+      // Los customers registrados van a la página principal
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 1000);
 
-    window.location.href = "/login";
-
-  } catch (error) {
-    toast({
-      title: "Error en el registro",
-      description: "No se pudo crear la cuenta. Intenta nuevamente.",
-      variant: "destructive",
-    });
-  } finally {
-    setIsLoading(false);
-  }
-};
-
-
+    } catch (error) {
+      toast({
+        title: "Error en el registro",
+        description: "No se pudo crear la cuenta. Intenta nuevamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-cornsilk via-warm to-accent flex items-center justify-center p-4">

@@ -23,7 +23,30 @@ export function Layout({ children }: LayoutProps) {
     updateCartCount();
     const unsubscribe = cartStore.subscribe(updateCartCount);
 
-    return unsubscribe;
+    // Escuchar eventos personalizados para actualizar el carrito
+    const handleUserLogin = () => {
+      // Pequeño delay para asegurar que el carrito se haya cargado
+      setTimeout(updateCartCount, 200);
+    };
+
+    const handleUserLogout = () => {
+      updateCartCount();
+    };
+
+    const handleCartUpdated = () => {
+      updateCartCount();
+    };
+
+    window.addEventListener('userLogin', handleUserLogin);
+    window.addEventListener('userLogout', handleUserLogout);
+    window.addEventListener('cartUpdated', handleCartUpdated);
+
+    return () => {
+      unsubscribe();
+      window.removeEventListener('userLogin', handleUserLogin);
+      window.removeEventListener('userLogout', handleUserLogout);
+      window.removeEventListener('cartUpdated', handleCartUpdated);
+    };
   }, []);
 
   useEffect(() => {
@@ -35,6 +58,7 @@ export function Layout({ children }: LayoutProps) {
 
     updateUser();
 
+    // Escuchar cambios en sessionStorage para actualizar el estado del usuario
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'user') {
         updateUser();
@@ -53,7 +77,7 @@ export function Layout({ children }: LayoutProps) {
   const handleLogout = async () => {
     try {
       await logoutUser();
-      setUser(null); 
+      setUser(null); // Actualizar el estado inmediatamente
       window.location.href = "/login";
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
@@ -73,39 +97,71 @@ export function Layout({ children }: LayoutProps) {
               <span className="text-xl font-bold text-foreground">Barroco Ceramics</span>
             </Link>
 
+            {/* Navegación condicional según el rol del usuario */}
             <nav className="hidden md:flex items-center space-x-6">
-              <Link 
-                to="/" 
-                className={`text-sm font-medium transition-colors hover:text-primary ${isActive('/') ? 'text-primary' : 'text-muted-foreground'}`}
-              >
-                Inicio
-              </Link>
-              <Link 
-                to="/productos" 
-                className={`text-sm font-medium transition-colors hover:text-primary ${isActive('/productos') ? 'text-primary' : 'text-muted-foreground'}`}
-              >
-                Productos
-              </Link>
-              <Link 
-                to="/personalizar" 
-                className={`text-sm font-medium transition-colors hover:text-primary ${isActive('/personalizar') ? 'text-primary' : 'text-muted-foreground'}`}
-              >
-                Personalizar
-              </Link>
+              {/* Solo mostrar navegación pública si no es admin o employee */}
+              {(!user || user.role === "customer") && (
+                <>
+                  <Link 
+                    to="/" 
+                    className={`text-sm font-medium transition-colors hover:text-primary ${isActive('/') ? 'text-primary' : 'text-muted-foreground'}`}
+                  >
+                    Inicio
+                  </Link>
+                  <Link 
+                    to="/productos" 
+                    className={`text-sm font-medium transition-colors hover:text-primary ${isActive('/productos') ? 'text-primary' : 'text-muted-foreground'}`}
+                  >
+                    Productos
+                  </Link>
+                  <Link 
+                    to="/personalizar" 
+                    className={`text-sm font-medium transition-colors hover:text-primary ${isActive('/personalizar') ? 'text-primary' : 'text-muted-foreground'}`}
+                  >
+                    Personalizar
+                  </Link>
+                </>
+              )}
+              
+              {/* Navegación para Admin */}
+              {user?.role === "admin" && (
+                <>
+                  <Link 
+                    to="/admin" 
+                    className={`text-3xl font-medium transition-colors hover:text-primary ${isActive('/admin') ? 'text-primary' : 'text-muted-foreground'}`}
+                  >
+                    Admin
+                  </Link>
+                </>
+              )}
+              
+              {/* Navegación para Employee */}
+              {user?.role === "employee" && (
+                <>
+                  <Link 
+                    to="/dashboard" 
+                    className={`text-3xl font-medium transition-colors hover:text-primary ${isActive('/dashboard') ? 'text-primary' : 'text-muted-foreground'}`}
+                  >
+                    Empleado
+                  </Link>
+                </>
+              )}
             </nav>
             
             <div className="flex items-center space-x-4">
-              {/* Cart */}
-              <Link to="/carrito">
-                <Button variant="ghost" size="icon" className="relative">
-                  <ShoppingCart className="h-4 w-4" />
-                  {cartCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-ceramics text-ceramics-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                      {cartCount}
-                    </span>
-                  )}
-                </Button>
-              </Link>
+              {/* Cart - Solo para customers y usuarios no logueados */}
+              {(!user || user.role === "customer") && (
+                <Link to="/carrito">
+                  <Button variant="ghost" size="icon" className="relative">
+                    <ShoppingCart className="h-4 w-4" />
+                    {cartCount > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-ceramics text-ceramics-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                        {cartCount}
+                      </span>
+                    )}
+                  </Button>
+                </Link>
+              )}
 
               {/* User */}
               {!isLoading && (
