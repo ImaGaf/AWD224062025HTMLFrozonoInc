@@ -9,6 +9,7 @@ async function api<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const response = await fetch(`${BASE_URL}${endpoint}`, {
     headers: {
       'Content-Type': 'application/json',
+      'Authorization': `Basic ${credentials}`,
       ...options?.headers,
     },
     ...options,
