@@ -37,17 +37,37 @@ const getMostSoldProducts = async () => {
 
 
 const getTopCustomers = async () => {
-  const orders = await Order.find();
+  // Poblar el campo customer para acceder a idCustomer, firstName y lastName
+  const orders = await Order.find().populate('customer'); 
+
   const map = {};
   orders.forEach(order => {
-    const id = order.customer.toString();
-    map[id] = (map[id] || 0) + order.total;
+    if (order.customer && order.customer.idCustomer != null) {
+      const id = order.customer.idCustomer;
+
+      // Si no existe aún, inicializamos el objeto
+      if (!map[id]) {
+        map[id] = {
+          idCustomer: id,
+          firstName: order.customer.firstName,
+          lastName: order.customer.lastName,
+          totalSpent: 0
+        };
+      }
+
+      map[id].totalSpent += order.total;
+    }
   });
-  const sorted = Object.entries(map)
-    .sort((a, b) => b[1] - a[1])
-    .map(([customerId, totalSpent]) => ({ customerId, totalSpent }));
-  return { topCustomers: sorted.slice(0, 5) };
+
+  // Convertimos el objeto en array y ordenamos por totalSpent
+  const sorted = Object.values(map)
+    .sort((a, b) => b.totalSpent - a.totalSpent)
+    .slice(0, 5); // Top 5
+
+  return { topCustomers: sorted };
 };
+
+
 
 const getCategorySales = async () => {
   const items = await CartItem.find()

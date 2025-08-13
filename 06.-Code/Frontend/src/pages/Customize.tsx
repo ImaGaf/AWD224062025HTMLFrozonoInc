@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
+import { ensureCartExists, upsertCartForCurrentUser } from "@/lib/cart-sync";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Separator } from "@/components/ui/separator";
@@ -10,6 +11,7 @@ import { ShoppingCart, Palette, Ruler, Sparkles, ArrowLeft, ArrowRight } from "l
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { cartStore } from "@/lib/cart-store";
+import { productAPI, categoryAPI, getCurrentUser } from "@/lib/api";
 
 interface CustomizationOptions {
   productType: string;
@@ -23,7 +25,7 @@ interface CustomizationOptions {
 
 export default function Customize() {
   const { toast } = useToast();
-  
+  const [isAddingToCart, setIsAddingToCart] = useState<string | null>(null);
   const [step, setStep] = useState(1);
   const [customization, setCustomization] = useState<CustomizationOptions>({
     productType: "",
@@ -88,41 +90,73 @@ export default function Customize() {
     return (basePrice + designPrice + glazePrice) * customization.quantity;
   };
 
-  const addToCart = () => {
-    if (!customization.productType || !customization.color || !customization.size) {
-      toast({
-        title: "Personalización incompleta",
-        description: "Por favor completa todos los campos requeridos",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const selectedProduct = productTypes.find(p => p.id === customization.productType);
-    const finalPrice = calculatePrice();
-
-    const cartItem = {
-      id: `custom-${Date.now()}`,
-      productId: `custom-${customization.productType}`,
-      name: `${selectedProduct?.name} Personalizada`,
-      price: finalPrice / customization.quantity,
-      quantity: customization.quantity,
-      customization: {
-        productType: customization.productType,
-        color: colors.find(c => c.id === customization.color)?.name,
-        size: sizes.find(s => s.id === customization.size)?.name,
-        design: designs.find(d => d.id === customization.design)?.name,
-        glaze: glazes.find(g => g.id === customization.glaze)?.name,
-      }
-    };
-
-    cartStore.addItem(cartItem);
-
-    toast({
-      title: "Producto personalizado agregado",
-      description: "Tu pieza única ha sido añadida al carrito",
-    });
-  };
+  const addToCart = async (product: any) => {
+     const user = getCurrentUser();
+     
+     if (!user || user.role !== "customer") {
+       toast({
+         title: "Error",
+         description: "Debes iniciar sesión como cliente para agregar productos al carrito",
+         variant: "destructive",
+       });
+       return;
+     }
+ 
+     const productId = product.idProduct || `temp-${Date.now()}`;
+     setIsAddingToCart(productId);
+ 
+     try {
+       console.log("Agregando producto al carrito:", product);
+       const cartId = await ensureCartExists();
+       
+       if (!cartId) {
+         throw new Error("No se pudo crear o encontrar carrito");
+       }
+ 
+       console.log("Carrito asegurado con ID:", cartId);
+ 
+ 
+       const cartItem = {
+         id: `${productId}-${Date.now()}`,
+         productId: productId,
+         name: product.name || "Producto",
+         price: product.price || 29.99,
+         quantity: 1,
+       };
+       
+       cartStore.addItem(cartItem);
+       console.log("Producto agregado al store local:", cartItem);
+       
+       await upsertCartForCurrentUser();
+       console.log("Carrito sincronizado con backend");
+ 
+       sessionStorage.setItem("cart", JSON.stringify(cartStore.getItems()));
+ 
+       toast({
+         title: "Producto agregado",
+         description: `${product.name} se ha añadido al carrito`,
+       });
+     } catch (error) {
+       console.error("Error al agregar al carrito:", error);
+       
+       const items = cartStore.getItems();
+       const itemToRemove = items.find(item => 
+         item.productId === productId && 
+         item.id.includes(`${productId}-`)
+       );
+       if (itemToRemove) {
+         cartStore.removeItem(itemToRemove.id);
+       }
+       
+       toast({
+         title: "Error",
+         description: "No se pudo agregar el producto al carrito. Intenta de nuevo.",
+         variant: "destructive",
+       });
+     } finally {
+       setIsAddingToCart(null);
+     }
+   };
 
   const nextStep = () => {
     if (step < 4) setStep(step + 1);
@@ -158,9 +192,7 @@ export default function Customize() {
 
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Customization Steps */}
           <div className="lg:col-span-2">
-            {/* Step 1: Product Type */}
             {step === 1 && (
               <Card>
                 <CardHeader>
@@ -196,7 +228,6 @@ export default function Customize() {
               </Card>
             )}
 
-            {/* Step 2: Color & Size */}
             {step === 2 && (
               <div className="space-y-6">
                 <Card>
@@ -268,7 +299,6 @@ export default function Customize() {
               </div>
             )}
 
-            {/* Step 3: Design & Finish */}
             {step === 3 && (
               <div className="space-y-6">
                 <Card>
@@ -345,7 +375,6 @@ export default function Customize() {
               </div>
             )}
 
-            {/* Step 4: Final Details */}
             {step === 4 && (
               <Card>
                 <CardHeader>
@@ -376,7 +405,6 @@ export default function Customize() {
 
                   <Separator />
 
-                  {/* Summary */}
                   <div>
                     <h3 className="font-semibold mb-4">Resumen de tu Personalización</h3>
                     <div className="space-y-2 text-sm">
@@ -410,7 +438,6 @@ export default function Customize() {
               </Card>
             )}
 
-            {/* Navigation */}
             <div className="flex justify-between mt-6">
               <Button
                 variant="outline"
@@ -446,19 +473,15 @@ export default function Customize() {
             </div>
           </div>
 
-          {/* Preview & Price */}
           <div className="lg:col-span-1">
             <Card className="sticky top-4">
               <CardHeader>
                 <CardTitle>Vista Previa</CardTitle>
               </CardHeader>
               <CardContent>
-                {/* Product Preview */}
                 <div className="aspect-square bg-gradient-to-br from-accent to-warm rounded-lg flex items-center justify-center text-6xl mb-4">
                   {productTypes.find(p => p.id === customization.productType)?.icon || "🏺"}
                 </div>
-
-                {/* Selected Options */}
                 {customization.color && (
                   <div className="mb-4">
                     <div className="flex items-center space-x-2">
@@ -475,7 +498,6 @@ export default function Customize() {
 
                 <Separator className="my-4" />
 
-                {/* Price */}
                 <div className="text-center">
                   <div className="text-3xl font-bold text-ceramics mb-2">
                     ${calculatePrice().toFixed(2)}

@@ -1,4 +1,3 @@
-// Simple cart state management
 interface CartItem {
   id: string;
   productId: string;
