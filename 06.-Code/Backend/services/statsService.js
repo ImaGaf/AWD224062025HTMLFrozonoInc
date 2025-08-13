@@ -37,7 +37,6 @@ const getMostSoldProducts = async () => {
 
 
 const getTopCustomers = async () => {
-  // Poblar el campo customer para acceder a idCustomer, firstName y lastName
   const orders = await Order.find().populate('customer'); 
 
   const map = {};
@@ -45,7 +44,6 @@ const getTopCustomers = async () => {
     if (order.customer && order.customer.idCustomer != null) {
       const id = order.customer.idCustomer;
 
-      // Si no existe aún, inicializamos el objeto
       if (!map[id]) {
         map[id] = {
           idCustomer: id,
@@ -59,7 +57,6 @@ const getTopCustomers = async () => {
     }
   });
 
-  // Convertimos el objeto en array y ordenamos por totalSpent
   const sorted = Object.values(map)
     .sort((a, b) => b.totalSpent - a.totalSpent)
     .slice(0, 5); // Top 5
