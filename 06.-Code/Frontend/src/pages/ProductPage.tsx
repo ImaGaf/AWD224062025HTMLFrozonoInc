@@ -5,10 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { productAPI, statsAPI } from "@/lib/api";
+import { Link } from "react-router-dom";
 
 export default function ProductPage() {
   const { toast } = useToast();
-  //const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
 
@@ -109,12 +109,10 @@ export default function ProductPage() {
     fetchProducts();
   }, []);
 
-  // ---- Actualizar producto (price & stock) ----
   const handleUpdate = async () => {
     if (!editingProduct) return;
     setLoading(true);
     try {
-      // Validaciones simples
       const price = Number(editingProduct.price);
       const stock = Number(editingProduct.stock);
       if (isNaN(price) || isNaN(stock)) {
@@ -148,12 +146,12 @@ export default function ProductPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-cornsilk via-warm to-accent p-6">
+      
       <Card className="max-w-4xl mx-auto bg-card/95 backdrop-blur">
         <CardHeader>
           <CardTitle className="text-2xl font-bold">Gestión de Productos</CardTitle>
         </CardHeader>
         <CardContent>
-          {/* Buscadores y botones */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
             <div className="md:col-span-2 flex gap-2">
               <Input
@@ -162,7 +160,7 @@ export default function ProductPage() {
                 value={searchName}
                 onChange={(e) => setSearchName(e.target.value)}
               />
-              <Button onClick={() => { /* el filtro es reactivo, este botón solo recarga la lista */ fetchProducts(); }}>
+              <Button onClick={() => { fetchProducts(); }}>
                 Recargar
               </Button>
             </div>
@@ -182,10 +180,24 @@ export default function ProductPage() {
             <Button onClick={fetchProducts} className="bg-ceramics">Todos</Button>
             <Button onClick={getLowStockProducts} className="bg-red-500">Sin Stock</Button>
           </div>
+                <div className="w-60 bg-gray-800 text-white flex flex-col p-4">
+                  <h2 className="text-lg font-bold mb-6">Menú</h2>
+                  <Link to="/clientes" className="mb-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded">
+                    Clientes
+                  </Link>
+                  <Link to="/empleados" className="mb-2 bg-green-500 hover:bg-green-600 px-4 py-2 rounded">
+                    Empleados
+                  </Link>
+                  <Link to="/dashboard" className="mb-2 bg-yellow-500 hover:bg-yellow-600 px-4 py-2 rounded">
+                    Dashboard
+                  </Link>
+                  <Link to="/ordenpedidos" className="mb-2 bg-purple-500 hover:bg-purple-600 px-4 py-2 rounded">
+                    Ordenes
+                  </Link>
+                </div>
 
           <Separator />
 
-          {/* Contenido */}
           {loading ? (
             <p className="text-center my-6">Cargando productos...</p>
           ) : filteredProducts.length > 0 ? (
@@ -231,7 +243,6 @@ export default function ProductPage() {
                     </div>
                   </div>
 
-                  {/* Panel de edición debajo del producto seleccionado */}
                   {editingProduct?.id === product._id && (
                     <div className="mt-4 p-3 border rounded-md bg-muted">
                       <h3 className="text-sm font-semibold mb-2">Actualizar Producto</h3>

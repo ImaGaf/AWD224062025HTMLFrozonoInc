@@ -21,11 +21,14 @@ export default function Cart() {
       setCartItems([...cartStore.getItems()]);
     };
 
-    updateCart();
+    loadCartForCurrentUser()
+      .then(() => updateCart())
+      .catch(() => updateCart());
+
     const unsubscribe = cartStore.subscribe(updateCart);
-    loadCartForCurrentUser().catch(() => { });
     return unsubscribe;
   }, []);
+
 
   const updateQuantity = async (id: string, newQuantity: number) => {
     if (newQuantity === 0) {
@@ -55,7 +58,7 @@ export default function Cart() {
     if (productId.includes('custom-plate') || name.includes('Plato')) return '🍽️';
     if (productId.includes('custom-vase') || name.includes('Jarrón')) return '🏺';
     if (productId.includes('custom-bowl') || name.includes('Cuenco')) return '🥣';
-    return '🏺'; // default
+    return '🏺';
   };
 
   const proceedToCheckout = async () => {
@@ -84,7 +87,6 @@ export default function Cart() {
       description: "Guardando tu carrito y redirigiendo al checkout",
     });
 
-    // Guardamos/actualizamos el carrito en el backend
     await upsertCartForCurrentUser().catch(() => { });
 
     navigate("/checkout");
@@ -92,7 +94,6 @@ export default function Cart() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <section className="bg-gradient-to-r from-cornsilk to-warm py-8">
         <div className="container mx-auto px-4">
           <div className="flex items-center space-x-4">
@@ -113,7 +114,6 @@ export default function Cart() {
 
       <div className="container mx-auto px-4 py-8">
         {cartItems.length === 0 ? (
-          // Empty Cart
           <div className="text-center py-16">
             <div className="text-6xl mb-6">🛒</div>
             <h2 className="text-2xl font-semibold mb-4">Tu carrito está vacío</h2>
@@ -137,12 +137,10 @@ export default function Cart() {
                 <Card key={item.id}>
                   <CardContent className="p-6">
                     <div className="flex flex-col md:flex-row gap-4">
-                      {/* Product Image */}
                       <div className="w-full md:w-32 h-32 bg-gradient-to-br from-accent to-warm rounded-lg flex items-center justify-center text-4xl">
                         {getProductIcon(item.productId, item.name)}
                       </div>
 
-                      {/* Product Details */}
                       <div className="flex-1">
                         <div className="flex justify-between items-start mb-2">
                           <h3 className="text-lg font-semibold">{item.name}</h3>
@@ -160,7 +158,6 @@ export default function Cart() {
                           ${item.price.toFixed(2)}
                         </div>
 
-                        {/* Customization */}
                         {item.customization && (
                           <div className="mb-4">
                             <p className="text-sm text-muted-foreground mb-2">Personalización:</p>
@@ -172,7 +169,6 @@ export default function Cart() {
                           </div>
                         )}
 
-                        {/* Quantity Controls */}
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-2">
                             <span className="text-sm text-muted-foreground">Cantidad:</span>
@@ -214,7 +210,7 @@ export default function Cart() {
               ))}
             </div>
 
-            {/* Order Summary */}
+
             <div className="lg:col-span-1">
               <Card className="sticky top-4">
                 <CardHeader>
@@ -270,7 +266,6 @@ export default function Cart() {
                     </Link>
                   </div>
 
-                  {/* Trust Indicators */}
                   <div className="pt-4 space-y-2">
                     <div className="flex items-center text-sm text-muted-foreground">
                       <span className="mr-2">🔒</span>

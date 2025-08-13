@@ -5,13 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { customerAPI } from "@/lib/api";
+import { Link } from "react-router-dom";
 
 export default function CustomersPage() {
   const { toast } = useToast();
   const [customers, setCustomers] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Estado para crear un nuevo cliente
   const [newCustomer, setNewCustomer] = useState({
     firstName: "",
     lastName: "",
@@ -23,7 +23,6 @@ export default function CustomersPage() {
     role: "customer",
   });
 
-  // Estados para actualizar un cliente
   const [editCustomerId, setEditCustomerId] = useState<string | null>(null);
   const [editCustomer, setEditCustomer] = useState({
     phone: "",
@@ -31,7 +30,6 @@ export default function CustomersPage() {
     shippingAddress: "",
   });
 
-  // Obtener todos los clientes
   const fetchCustomers = async () => {
     try {
       const data = await customerAPI.getAll();
@@ -50,7 +48,7 @@ export default function CustomersPage() {
     fetchCustomers();
   }, []);
 
-  // Crear cliente
+
   const handleCreate = async () => {
     try {
       await customerAPI.create(newCustomer);
@@ -59,7 +57,7 @@ export default function CustomersPage() {
         description: "El cliente ha sido registrado correctamente",
       });
 
-      // Resetear formulario
+
       setNewCustomer({
         firstName: "",
         lastName: "",
@@ -82,7 +80,6 @@ export default function CustomersPage() {
     }
   };
 
-  // Actualizar cliente
   const handleUpdate = async (id: string) => {
     try {
       await customerAPI.update(id, editCustomer);
@@ -102,7 +99,6 @@ export default function CustomersPage() {
     }
   };
 
-  // Eliminar cliente
   const handleDelete = async (id: string) => {
     try {
       await customerAPI.delete(id);
@@ -121,7 +117,6 @@ export default function CustomersPage() {
     }
   };
 
-  // Filtrar clientes por búsqueda
   const filteredCustomers = customers.filter((c) => {
     const term = searchTerm.toLowerCase();
     return (
@@ -138,8 +133,23 @@ export default function CustomersPage() {
         <CardHeader>
           <CardTitle className="text-2xl font-bold">Gestión de Clientes</CardTitle>
         </CardHeader>
+              <div className="w-60 bg-gray-800 text-white flex flex-col p-4">
+                <h2 className="text-lg font-bold mb-6">Menú</h2>
+                <Link to="/dashboard" className="mb-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded">
+                  Dashboard
+                </Link>
+                <Link to="/empleados" className="mb-2 bg-green-500 hover:bg-green-600 px-4 py-2 rounded">
+                  Empleados
+                </Link>
+                <Link to="/productoscontrol" className="mb-2 bg-yellow-500 hover:bg-yellow-600 px-4 py-2 rounded">
+                  Productos
+                </Link>
+                <Link to="/ordenpedidos" className="mb-2 bg-purple-500 hover:bg-purple-600 px-4 py-2 rounded">
+                  Ordenes
+                </Link>
+              </div>
+
         <CardContent>
-          {/* Formulario de creación */}
           <div className="grid grid-cols-2 gap-4 mb-6">
             <Input placeholder="Nombre" value={newCustomer.firstName} onChange={(e) => setNewCustomer({ ...newCustomer, firstName: e.target.value })} />
             <Input placeholder="Apellido" value={newCustomer.lastName} onChange={(e) => setNewCustomer({ ...newCustomer, lastName: e.target.value })} />
@@ -156,10 +166,8 @@ export default function CustomersPage() {
 
           <Separator className="my-6" />
 
-          {/* Barra de búsqueda */}
           <Input placeholder="Buscar cliente por ID, nombre o email" className="mb-4" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
 
-          {/* Lista de clientes */}
           {filteredCustomers.length > 0 ? (
             <ul className="space-y-3">
               {filteredCustomers.map((c) => (
@@ -184,7 +192,6 @@ export default function CustomersPage() {
                     </Button>
                   </div>
 
-                  {/* Formulario de actualización */}
                   {editCustomerId === c._id && (
                     <div className="mt-3 p-3 border rounded bg-muted">
                       <Input placeholder="Teléfono" value={editCustomer.phone} onChange={(e) => setEditCustomer({ ...editCustomer, phone: e.target.value })} />

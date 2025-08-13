@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { orderAPI } from "@/lib/api"; // Asegúrate de que tenga getAll incluido
+import { orderAPI } from "@/lib/api"; 
+import { Link } from "react-router-dom";
 
 export default function OrdersPage() {
   const { toast } = useToast();
@@ -13,13 +14,12 @@ export default function OrdersPage() {
   const [editingOrder, setEditingOrder] = useState<{ id: string; status: string } | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Obtener todas las órdenes
+
   const fetchOrders = async () => {
     try {
       const data = await orderAPI.getAll();
       console.log("Órdenes recibidas:", data);
 
-      // Validar que sea un array
       setOrders(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Error al obtener órdenes:", error);
@@ -38,7 +38,6 @@ export default function OrdersPage() {
     fetchOrders();
   }, []);
 
-  // Actualizar estatus
   const handleUpdate = async () => {
     if (!editingOrder) return;
     try {
@@ -59,14 +58,12 @@ export default function OrdersPage() {
     }
   };
 
-  // Filtrar por búsqueda
   const filteredOrders = orders.filter((order) => {
     const idOrder = order.idOrder?.toLowerCase() || "";
     const products = order.products?.toLowerCase() || "";
     return idOrder.includes(search.toLowerCase()) || products.includes(search.toLowerCase());
   });
 
-  // Color por estatus
   const getStatusColor = (status: string) => {
     switch (status?.toLowerCase()) {
       case "entregado":
@@ -80,7 +77,6 @@ export default function OrdersPage() {
     }
   };
 
-  // Renderizar
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -96,7 +92,6 @@ export default function OrdersPage() {
           <CardTitle className="text-2xl font-bold">Gestión de Órdenes</CardTitle>
         </CardHeader>
         <CardContent>
-          {/* Buscador */}
           <div className="mb-6">
             <Input
               type="text"
@@ -105,8 +100,21 @@ export default function OrdersPage() {
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-
-          {/* Lista de órdenes */}
+                <div className="w-60 bg-gray-800 text-white flex flex-col p-4">
+                  <h2 className="text-lg font-bold mb-6">Menú</h2>
+                  <Link to="/clientes" className="mb-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded">
+                    Clientes
+                  </Link>
+                  <Link to="/empleados" className="mb-2 bg-green-500 hover:bg-green-600 px-4 py-2 rounded">
+                    Empleados
+                  </Link>
+                  <Link to="/productoscontrol" className="mb-2 bg-yellow-500 hover:bg-yellow-600 px-4 py-2 rounded">
+                    Productos
+                  </Link>
+                  <Link to="/dashboard" className="mb-2 bg-purple-500 hover:bg-purple-600 px-4 py-2 rounded">
+                    Dashboard
+                  </Link>
+                </div>
           {filteredOrders.length > 0 ? (
             <ul className="space-y-3">
               {filteredOrders.map((order) => {
@@ -140,7 +148,6 @@ export default function OrdersPage() {
                       Editar Estatus
                     </Button>
 
-                    {/* Formulario de edición */}
                     {editingOrder?.id === (order._id || order.idOrder) && (
                       <div className="mt-4 p-3 border rounded-md bg-muted">
                         <h3 className="text-sm font-semibold mb-2">Actualizar Estatus</h3>

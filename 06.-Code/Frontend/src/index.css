@@ -2,13 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
 
 @layer base {
   :root {
-    /* Ceramic pastel theme inspired by uploaded palette */
     --background: 160 20% 98%;
     --foreground: 160 15% 15%;
 
@@ -18,36 +14,29 @@ All colors MUST be HSL.
     --popover: 160 25% 97%;
     --popover-foreground: 160 15% 15%;
 
-    /* Sage green primary (A6C3AD) */
     --primary: 160 25% 70%;
     --primary-foreground: 160 50% 98%;
     --primary-hover: 160 30% 65%;
 
-    /* Ash gray secondary (B9CCAE) */
+
     --secondary: 85 20% 75%;
     --secondary-foreground: 160 25% 20%;
 
-    /* Tea green muted (CCD5AE) */
     --muted: 75 25% 80%;
     --muted-foreground: 160 15% 40%;
 
-    /* Beige accent (E9EDC9) */
     --accent: 60 35% 88%;
     --accent-foreground: 160 25% 20%;
 
-    /* Cornsilk light (FEFAE0) */
     --cornsilk: 50 70% 95%;
     --cornsilk-foreground: 160 25% 20%;
 
-    /* Papaya warm (FAEDCD) */
     --warm: 35 65% 90%;
     --warm-foreground: 160 25% 20%;
 
-    /* Buff orange (D3A373) */
     --ceramics: 25 55% 65%;
     --ceramics-foreground: 25 20% 98%;
-
-    /* Pastel gradient colors for products */
+    
     --pastel-pink: 350 70% 88%;
     --pastel-cream: 45 80% 92%;
     --pastel-lavender: 270 50% 88%;

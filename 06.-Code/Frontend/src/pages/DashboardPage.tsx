@@ -1,14 +1,35 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-// Simulación de productAPI.getById (reemplázalo con tu import real)
+const BASE_URL = "https://awd224062025htmlfrozonoinc-1.onrender.com";
+
+function getAuthHeaders() {
+  return {
+    "Content-Type": "application/json",
+    'Authorization':     "Basic " +
+    btoa(
+      `${import.meta.env.VITE_API_USER}:${import.meta.env.VITE_API_PASS}`
+    ),
+  };
+}
+
+async function apiFetch<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+  const res = await fetch(`${BASE_URL}${endpoint}`, {
+    ...options,
+    headers: {
+      ...getAuthHeaders(),
+      ...(options.headers || {})
+    }
+  });
+  if (!res.ok) {
+    throw new Error(`Error en ${endpoint}: ${res.status}`);
+  }
+  return res.json();
+}
+
 const productAPI = {
   getById: async (id: string) => {
-    const res = await fetch(
-      `https://awd224062025htmlfrozonoinc.onrender.com/barroco/products/${id}`
-    );
-    if (!res.ok) throw new Error("Error al obtener producto");
-    return res.json();
+    return apiFetch(`/barroco/products/${id}`);
   },
 };
 
@@ -19,58 +40,38 @@ export default function Dashboard() {
   const [lowStockProducts, setLowStockProducts] = useState<any[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>("");
 
-  // Top Customers
+
   const getTopCustomers = async () => {
     try {
-      const res = await fetch(
-        "https://awd224062025htmlfrozonoinc.onrender.com/barroco/stats/top-customers"
-      );
-      if (!res.ok) throw new Error("Error al obtener top customers");
-      const data = await res.json();
+      const data = await apiFetch<{ topCustomers: any[] }>("/barroco/stats/top-customers");
       setTopCustomers(data.topCustomers || []);
     } catch (error) {
       console.error(error);
     }
   };
 
-  // Monthly Income
   const getMonthlyIncome = async () => {
     try {
-      const res = await fetch(
-        "https://awd224062025htmlfrozonoinc.onrender.com/barroco/stats/monthly-income"
-      );
-      if (!res.ok) throw new Error("Error al obtener ingresos mensuales");
-      const data = await res.json();
+      const data = await apiFetch<{ monthlyIncome: any[] }>("/barroco/stats/monthly-income");
       setMonthlyIncome(data.monthlyIncome || []);
     } catch (error) {
       console.error(error);
     }
   };
-
-  // Total Sales
   const getTotalSales = async () => {
     try {
-      const res = await fetch(
-        "https://awd224062025htmlfrozonoinc.onrender.com/barroco/stats/total-sales"
-      );
-      if (!res.ok) throw new Error("Error al obtener ventas totales");
-      const data = await res.json();
+      const data = await apiFetch<{ totalSales: number }>("/barroco/stats/total-sales");
       setTotalSales(data.totalSales || 0);
     } catch (error) {
       console.error(error);
     }
   };
 
-  // Low Stock Products con nombre
   const getLowStockProducts = async () => {
     try {
       setErrorMessage("");
-      const res = await fetch(
-        "https://awd224062025htmlfrozonoinc.onrender.com/barroco/stats/product/low-stock"
-      );
-      if (!res.ok) throw new Error("Error al obtener productos sin stock");
+      const data = await apiFetch<any[]>("/barroco/stats/product/low-stock");
 
-      const data = await res.json();
       if (!Array.isArray(data)) {
         setErrorMessage("Formato de datos inválido");
         return;
@@ -125,15 +126,13 @@ export default function Dashboard() {
           Productos
         </Link>
         <Link to="/ordenpedidos" className="mb-2 bg-purple-500 hover:bg-purple-600 px-4 py-2 rounded">
-          Ordenes
+          Órdenes
         </Link>
       </div>
 
-      {/* Contenido */}
       <div className="flex-1 p-6 bg-gray-100">
         <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
 
-        {/* Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div className="bg-white p-4 shadow rounded">
             <h3 className="font-semibold text-lg">Ventas Totales</h3>
@@ -143,8 +142,10 @@ export default function Dashboard() {
           <div className="bg-white p-4 shadow rounded">
             <h3 className="font-semibold text-lg">Top Clientes</h3>
             {topCustomers.map((c) => (
-              <p key={c.customerId}>
-                ID: {c.customerId} — <span className="font-bold">${c.totalSpent}</span>
+              <p key={c.idCustomer}>
+                ID: {c.idCustomer} —{" "}
+                Nombre: {c.firstName} {c.lastName} —{" "}
+                <span className="font-bold">${c.totalSpent}</span>
               </p>
             ))}
           </div>
@@ -159,7 +160,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Productos sin stock */}
         <div className="bg-white p-4 shadow rounded">
           <h3 className="font-semibold text-lg mb-2">Productos sin stock</h3>
           {errorMessage && <p className="text-red-500">{errorMessage}</p>}

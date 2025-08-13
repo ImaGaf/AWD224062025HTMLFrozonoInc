@@ -1,11 +1,15 @@
 import bcrypt from 'bcryptjs';
 
-const BASE_URL = 'https://awd224062025htmlfrozonoinc.onrender.com/barroco';
+const BASE_URL = 'https://awd224062025htmlfrozonoinc-1.onrender.com/barroco';
 
 async function api<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const response = await fetch(`${BASE_URL}${endpoint}`, {
     headers: {
       'Content-Type': 'application/json',
+      'Authorization':     "Basic " +
+    btoa(
+      `${import.meta.env.VITE_API_USER}:${import.meta.env.VITE_API_PASS}`
+    ),
       ...options?.headers,
     },
     ...options,
@@ -28,12 +32,27 @@ export const getCurrentUser = (): any | null => {
 };
 
 export const logoutUser = async () => {
-  const { clearUserCart } = await import('./cart-sync');
-  await clearUserCart();
-  sessionStorage.removeItem("user");
+  try {
+    const { clearUserCart } = await import('./cart-sync');
+    await clearUserCart();
+    
+    sessionStorage.removeItem("user");
+    sessionStorage.removeItem("shoppingCartId");
+    sessionStorage.removeItem("cart");
+    
+    window.dispatchEvent(new CustomEvent('userLogout'));
+    
+    console.log("Sesión cerrada exitosamente");
+  } catch (error) {
+    console.error("Error al cerrar sesión:", error);
+    sessionStorage.removeItem("user");
+    sessionStorage.removeItem("shoppingCartId");
+    sessionStorage.removeItem("cart");
+    
+    window.dispatchEvent(new CustomEvent('userLogout'));
+  }
 };
 
-// Customer API
 export const customerAPI = {
   create: (data: any) => api('/customers', { method: 'POST', body: JSON.stringify(data) }),
   getAll: () => api('/customers'),
@@ -42,7 +61,6 @@ export const customerAPI = {
   delete: (id: string) => api(`/customers/${id}`, { method: 'DELETE' }),
 };
 
-// Product API
 export const productAPI = {
   create: (data: any) => api('/products', { method: 'POST', body: JSON.stringify(data) }),
   getAll: () => api('/products'),
@@ -51,7 +69,6 @@ export const productAPI = {
   delete: (id: string) => api(`/products/${id}`, { method: 'DELETE' }),
 };
 
-// Cart API - Agregamos getByCustomer
 export const cartAPI = {
   create: (data: any) => api('/shoppingCart', { method: 'POST', body: JSON.stringify(data) }),
   getById: (id: string) => api(`/shoppingCart/${id}`),
@@ -60,7 +77,6 @@ export const cartAPI = {
   getByCustomer: (customerId: string) => api(`/shoppingCart/customer/${customerId}`),
 };
 
-// Cart Items API
 export const cartItemAPI = {
   create: (data: any) => api('/cartitems', { method: 'POST', body: JSON.stringify(data) }),
   getById: (id: string) => api(`/cartitems/${id}`),
@@ -68,7 +84,6 @@ export const cartItemAPI = {
   delete: (id: string) => api(`/cartitems/${id}`, { method: 'DELETE' }),
 };
 
-// Order API
 export const orderAPI = {
   create: (data: any) => api('/orders', { method: 'POST', body: JSON.stringify(data) }),
   getAll: () => api('/orders'),
@@ -77,7 +92,6 @@ export const orderAPI = {
   delete: (id: string) => api(`/orders/${id}`, { method: 'DELETE' }),
 };
 
-// Categories API
 export const categoryAPI = {
   create: (data: any) => api('/categories', { method: 'POST', body: JSON.stringify(data) }),
   getAll: () => api('/categories'),
@@ -85,7 +99,6 @@ export const categoryAPI = {
   delete: (id: string) => api(`/categories/${id}`, { method: 'DELETE' }),
 };
 
-// Payment API
 export const paymentAPI = {
   create: (data: any) => api('/payments', { method: 'POST', body: JSON.stringify(data) }),
   getAll: () => api('/payments'),
@@ -93,7 +106,6 @@ export const paymentAPI = {
   delete: (id: string) => api(`/payments/${id}`, { method: 'DELETE' }),
 };
 
-// Admin API
 export const adminAPI = {
   create: (data: any) => api('/administrators', { method: 'POST', body: JSON.stringify(data) }),
   getById: (id: string) => api(`/administrators/${id}`),
@@ -102,7 +114,7 @@ export const adminAPI = {
   getAll: () => api('/administrators'),
 };
 
-// Employee API
+
 export const employeeAPI = {
   create: (data: any) => api('/employees', { method: 'POST', body: JSON.stringify(data) }),
   getById: (id: string) => api(`/employees/${id}`),
@@ -111,7 +123,6 @@ export const employeeAPI = {
   getAll: () => api('/employees'),
 };
 
-// Stats API
 export const statsAPI = {
   totalSales: () => api('/stats/total-sales'),
   mostSoldProducts: () => api('/stats/most-sold-products'),
@@ -134,7 +145,6 @@ export const statsAPI = {
   dailySummary: (date: string) => api(`/stats/reports/daily-summary?date=${date}`),
 };
 
-// Invoice API
 export const invoiceAPI = {
   create: (data: any) => api('/invoices', { method: 'POST', body: JSON.stringify(data) }),
   getById: (id: string) => api(`/invoices/${id}`),
@@ -144,61 +154,77 @@ export const invoiceAPI = {
 
 export const LoginAPI = {
   login: async (email: string, password: string) => {
-    const adminsRaw = await adminAPI.getAll().catch(() => []);
-    const employeesRaw = await employeeAPI.getAll().catch(() => []);
-    const customersRaw = await customerAPI.getAll().catch(() => []);
+    try {
+      const adminsRaw = await adminAPI.getAll().catch(() => []);
+      const employeesRaw = await employeeAPI.getAll().catch(() => []);
+      const customersRaw = await customerAPI.getAll().catch(() => []);
 
-    const admins = Array.isArray(adminsRaw) ? adminsRaw : [];
-    const employees = Array.isArray(employeesRaw) ? employeesRaw : [];
-    const customers = Array.isArray(customersRaw) ? customersRaw : [];
+      const admins = Array.isArray(adminsRaw) ? adminsRaw : [];
+      const employees = Array.isArray(employeesRaw) ? employeesRaw : [];
+      const customers = Array.isArray(customersRaw) ? customersRaw : [];
 
-    const allUsers = [
-      ...admins.map((u: any) => ({ ...u, role: "admin" })),
-      ...employees.map((u: any) => ({ ...u, role: "employee" })),
-      ...customers.map((u: any) => ({ ...u, role: "customer" })),
-    ];
+      const allUsers = [
+        ...admins.map((u: any) => ({ ...u, role: "admin" })),
+        ...employees.map((u: any) => ({ ...u, role: "employee" })),
+        ...customers.map((u: any) => ({ ...u, role: "customer" })),
+      ];
 
-    const user = allUsers.find((u: any) => u.email === email);
-    if (!user) throw new Error("Usuario no encontrado");
+      const user = allUsers.find((u: any) => u.email === email);
+      if (!user) throw new Error("Usuario no encontrado");
 
-    const passwordMatch = await bcrypt.compare(password, user.password);
-    if (!passwordMatch) throw new Error("Contraseña incorrecta");
+      const passwordMatch = await bcrypt.compare(password, user.password);
+      if (!passwordMatch) throw new Error("Contraseña incorrecta");
 
-    sessionStorage.removeItem("shoppingCartId");
-    sessionStorage.removeItem("cart");
+      sessionStorage.removeItem("shoppingCartId");
+      sessionStorage.removeItem("cart");
 
-    sessionStorage.setItem("user", JSON.stringify(user));
-    
-    if (user.role === "customer") {
-      try {
-        console.log("Usuario customer logueado, cargando carrito existente...");
-        
-        const { loadCartForCurrentUser } = await import('./cart-sync');
-        
-        await loadCartForCurrentUser();
-        
-        console.log("Carrito del customer cargado exitosamente");
-      } catch (error) {
-        console.error("Error al cargar carrito del customer:", error);
+      sessionStorage.setItem("user", JSON.stringify(user));
+      
+      window.dispatchEvent(new CustomEvent('userLogin', { detail: user }));
+
+      if (user.role === "customer") {
+        try {
+          const { loadCartForCurrentUser } = await import('./cart-sync');
+          setTimeout(async () => {
+            try {
+              await loadCartForCurrentUser();
+              console.log("Carrito cargado exitosamente");
+            } catch (error) {
+              console.error("Error al cargar carrito del customer:", error);
+            }
+          }, 100);
+        } catch (error) {
+          console.error("Error al importar cart-sync:", error);
+        }
       }
-    }
 
-    return user;
+      return user;
+    } catch (error) {
+      console.error("Error en login:", error);
+      throw error;
+    }
   },
 };
 
 export const RegisterAPI = {
   registerCustomer: async (data: any) => {
-    const user = await customerAPI.create({ ...data });
-    const userWithRole = { ...(typeof user === 'object' && user !== null ? user : {}), role: "customer" };
-    
-    sessionStorage.removeItem("shoppingCartId");
-    sessionStorage.removeItem("cart");
+    try {
+      const user = await customerAPI.create({ ...data });
+      const userWithRole = { ...(typeof user === 'object' && user !== null ? user : {}), role: "customer" };
+      
+      sessionStorage.removeItem("shoppingCartId");
+      sessionStorage.removeItem("cart");
 
-    sessionStorage.setItem("user", JSON.stringify(userWithRole));
-    
-    console.log("Nuevo customer registrado, carrito se creará cuando sea necesario");
-    
-    return userWithRole;
+      sessionStorage.setItem("user", JSON.stringify(userWithRole));
+      
+      window.dispatchEvent(new CustomEvent('userLogin', { detail: userWithRole }));
+      
+      console.log("Nuevo customer registrado, carrito se creará cuando sea necesario");
+      
+      return userWithRole;
+    } catch (error) {
+      console.error("Error en registro:", error);
+      throw error;
+    }
   },
 };

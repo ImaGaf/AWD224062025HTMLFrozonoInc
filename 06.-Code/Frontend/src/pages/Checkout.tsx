@@ -49,7 +49,6 @@ export default function Checkout() {
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Solo UI: no procesamos tarjetas aquí. Integraremos Stripe más tarde.
     navigate("/payment-success");
   };
 
