@@ -10,7 +10,6 @@ export default function AddToCartSection() {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Fetch products from the API and set them to state
     productAPI.getAll().then(setProducts);
   }, []);
 
@@ -24,21 +23,19 @@ export default function AddToCartSection() {
       return;
     }
 
-    // Se crea la estructura para agregar el producto al carrito
     const productData = {
       product: [
         {
-          idProduct: product.id ?? product._id,  // ID del producto
-          quantity: 1, // Cantidad que deseas agregar al carrito
-          price: product.price,  // El precio del producto
+          idProduct: product.id ?? product._id,  
+          quantity: 1, 
+          price: product.price,  
         },
       ],
-      total: product.price,  // Total inicial (puedes ajustar esto según la lógica)
-      customer: "CUST001", // Aquí pondrías el ID del cliente actual, si lo tienes
+      total: product.price,  
+      customer: "CUST001", 
     };
 
     try {
-      // Llamada a la API para agregar el producto al carrito
       await cartAPI.create(productData);
       toast({ title: "Producto agregado al carrito" });
     } catch (err) {

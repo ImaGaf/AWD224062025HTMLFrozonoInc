@@ -39,26 +39,20 @@ function extractCartId(data: ShoppingCartResponse | null | undefined): string | 
 
 async function findCartByCustomerId(customerId: string): Promise<string | null> {
   try {
-    console.log("Buscando carrito para customer:", customerId);
     
     try {
       const cart = await cartAPI.getByCustomer?.(customerId);
       if (cart) {
         const cartId = extractCartId(cart);
         if (cartId) {
-          console.log("Carrito encontrado via getByCustomer:", cartId);
           return cartId;
         }
       }
     } catch (error) {
-      console.log("getByCustomer no disponible, intentando método alternativo");
     }
-
-    console.log("No se encontró carrito existente para customer:", customerId);
     return null;
     
   } catch (error) {
-    console.error("Error buscando carrito por customer ID:", error);
     return null;
   }
 }
@@ -69,7 +63,6 @@ export async function findOrCreateCartForCustomer(): Promise<string | null> {
   const customer = getCustomerIdentifier(user);
   
   if (!customer) {
-    console.log("No hay customer ID disponible");
     return null;
   }
 
@@ -78,11 +71,9 @@ export async function findOrCreateCartForCustomer(): Promise<string | null> {
     
     if (cartId) {
       sessionStorage.setItem(SHOPPING_CART_ID_KEY, cartId);
-      console.log("Carrito existente encontrado y guardado:", cartId);
       return cartId;
     }
 
-    console.log("Creando nuevo carrito para customer:", customer);
     const payload = buildPayload();
     
     const created = await cartAPI.create(payload);
@@ -90,15 +81,13 @@ export async function findOrCreateCartForCustomer(): Promise<string | null> {
     
     if (cartId) {
       sessionStorage.setItem(SHOPPING_CART_ID_KEY, cartId);
-      console.log("Nuevo carrito creado:", cartId);
       return cartId;
     } else {
-      console.error("No se pudo obtener ID del carrito creado");
+
       return null;
     }
     
   } catch (error) {
-    console.error("Error en findOrCreateCartForCustomer:", error);
     return null;
   }
 }
@@ -106,12 +95,10 @@ export async function findOrCreateCartForCustomer(): Promise<string | null> {
 export async function upsertCartForCurrentUser(): Promise<string | null> {
   const user = getCurrentUser();
   const customer = getCustomerIdentifier(user);
-  console.log("Sincronizando carrito para customer:", customer);
   
   if (!customer) return null;
 
   const payload = buildPayload();
-  console.log("Payload enviado:", payload);
 
   try {
     let cartId = await findCartByCustomerId(customer);
@@ -119,31 +106,26 @@ export async function upsertCartForCurrentUser(): Promise<string | null> {
     if (cartId) {
       try {
         const updated = await cartAPI.update(cartId, payload);
-        console.log("Carrito actualizado exitosamente");
         
         sessionStorage.setItem(SHOPPING_CART_ID_KEY, cartId);
         return cartId;
       } catch (updateError) {
-        console.error("Error actualizando carrito:", updateError);
         cartId = null;
       }
     }
     
     if (!cartId) {
-      console.log("Creando nuevo carrito...");
       const created = await cartAPI.create(payload);
       cartId = extractCartId(created);
       
       if (cartId) {
         sessionStorage.setItem(SHOPPING_CART_ID_KEY, cartId);
-        console.log("Nuevo carrito creado con ID:", cartId);
         return cartId;
       }
     }
     
     return cartId;
   } catch (error) {
-    console.error("Error en upsertCartForCurrentUser:", error);
     return null;
   }
 }
@@ -160,25 +142,20 @@ export async function loadCartForCurrentUser(): Promise<void> {
     const cartId = await findCartByCustomerId(customer);
     
     if (!cartId) {
-      console.log("No hay carrito para cargar");
       cartStore.clear();
       sessionStorage.removeItem(SHOPPING_CART_ID_KEY);
       return;
     }
 
-    console.log("Cargando carrito con ID:", cartId);
-
     sessionStorage.setItem(SHOPPING_CART_ID_KEY, cartId);
 
     const data = await cartAPI.getById(cartId);
-    console.log("Datos del carrito recibidos:", data);
     
     const cartData = data as { product?: any[]; products?: any[] } | undefined;
     const products: Array<{ idProduct: string; quantity: number; price: number; name?: string }> =
       Array.isArray(cartData?.product) ? cartData.product : 
       Array.isArray(cartData?.products) ? cartData.products : [];
 
-    console.log("Productos en el carrito:", products);
 
     cartStore.clear();
 
@@ -195,7 +172,6 @@ export async function loadCartForCurrentUser(): Promise<void> {
 
     sessionStorage.setItem("cart", JSON.stringify(cartStore.getItems()));
     
-    console.log(`Carrito cargado exitosamente con ${products.length} productos`);
     
   } catch (error) {
     console.error("Error al cargar carrito:", error);
@@ -234,7 +210,6 @@ export async function clearUserCart(): Promise<void> {
       const cartId = await findCartByCustomerId(customer);
       if (cartId) {
         await cartAPI.delete(cartId);
-        console.log("Carrito eliminado del backend");
       }
     } catch (error) {
       console.error("Error al eliminar carrito del backend:", error);
@@ -269,11 +244,9 @@ export async function initializeCart(): Promise<void> {
     return;
   }
 
-  console.log("Inicializando carrito para usuario:", user);
 
   try {
     await loadCartForCurrentUser();
-    console.log("Carrito inicializado desde backend");
   } catch (error) {
     console.error("Error al inicializar carrito:", error);
     
@@ -284,7 +257,6 @@ export async function initializeCart(): Promise<void> {
         if (Array.isArray(items)) {
           cartStore.clear();
           items.forEach(item => cartStore.addItem(item));
-          console.log("Carrito cargado desde sessionStorage como fallback:", items.length, "items");
         }
       } catch (parseError) {
         console.error("Error al parsear carrito local:", parseError);
@@ -311,7 +283,6 @@ export async function syncCart(): Promise<void> {
     const cartId = await ensureCartExists();
     if (cartId) {
       await upsertCartForCurrentUser();
-      console.log("Carrito sincronizado exitosamente");
     }
   } catch (error) {
     console.error("Error al sincronizar carrito:", error);

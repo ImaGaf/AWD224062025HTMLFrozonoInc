@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 
-const BASE_URL = 'https://awd224062025htmlfrozonoinc.onrender.com/barroco';
+const BASE_URL = 'https://awd224062025htmlfrozonoinc-1.onrender.com/barroco';
 
 async function api<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const response = await fetch(`${BASE_URL}${endpoint}`, {
@@ -33,22 +33,18 @@ export const getCurrentUser = (): any | null => {
 
 export const logoutUser = async () => {
   try {
-    // Limpiar carrito
     const { clearUserCart } = await import('./cart-sync');
     await clearUserCart();
     
-    // Limpiar todos los datos de sesión
     sessionStorage.removeItem("user");
     sessionStorage.removeItem("shoppingCartId");
     sessionStorage.removeItem("cart");
     
-    // Disparar evento personalizado para actualizar UI
     window.dispatchEvent(new CustomEvent('userLogout'));
     
     console.log("Sesión cerrada exitosamente");
   } catch (error) {
     console.error("Error al cerrar sesión:", error);
-    // Aún así limpiar sessionStorage
     sessionStorage.removeItem("user");
     sessionStorage.removeItem("shoppingCartId");
     sessionStorage.removeItem("cart");
@@ -57,7 +53,6 @@ export const logoutUser = async () => {
   }
 };
 
-// Customer API
 export const customerAPI = {
   create: (data: any) => api('/customers', { method: 'POST', body: JSON.stringify(data) }),
   getAll: () => api('/customers'),
@@ -66,7 +61,6 @@ export const customerAPI = {
   delete: (id: string) => api(`/customers/${id}`, { method: 'DELETE' }),
 };
 
-// Product API
 export const productAPI = {
   create: (data: any) => api('/products', { method: 'POST', body: JSON.stringify(data) }),
   getAll: () => api('/products'),
@@ -75,7 +69,6 @@ export const productAPI = {
   delete: (id: string) => api(`/products/${id}`, { method: 'DELETE' }),
 };
 
-// Cart API - Agregamos getByCustomer
 export const cartAPI = {
   create: (data: any) => api('/shoppingCart', { method: 'POST', body: JSON.stringify(data) }),
   getById: (id: string) => api(`/shoppingCart/${id}`),
@@ -84,7 +77,6 @@ export const cartAPI = {
   getByCustomer: (customerId: string) => api(`/shoppingCart/customer/${customerId}`),
 };
 
-// Cart Items API
 export const cartItemAPI = {
   create: (data: any) => api('/cartitems', { method: 'POST', body: JSON.stringify(data) }),
   getById: (id: string) => api(`/cartitems/${id}`),
@@ -92,7 +84,6 @@ export const cartItemAPI = {
   delete: (id: string) => api(`/cartitems/${id}`, { method: 'DELETE' }),
 };
 
-// Order API
 export const orderAPI = {
   create: (data: any) => api('/orders', { method: 'POST', body: JSON.stringify(data) }),
   getAll: () => api('/orders'),
@@ -101,7 +92,6 @@ export const orderAPI = {
   delete: (id: string) => api(`/orders/${id}`, { method: 'DELETE' }),
 };
 
-// Categories API
 export const categoryAPI = {
   create: (data: any) => api('/categories', { method: 'POST', body: JSON.stringify(data) }),
   getAll: () => api('/categories'),
@@ -109,7 +99,6 @@ export const categoryAPI = {
   delete: (id: string) => api(`/categories/${id}`, { method: 'DELETE' }),
 };
 
-// Payment API
 export const paymentAPI = {
   create: (data: any) => api('/payments', { method: 'POST', body: JSON.stringify(data) }),
   getAll: () => api('/payments'),
@@ -117,7 +106,6 @@ export const paymentAPI = {
   delete: (id: string) => api(`/payments/${id}`, { method: 'DELETE' }),
 };
 
-// Admin API
 export const adminAPI = {
   create: (data: any) => api('/administrators', { method: 'POST', body: JSON.stringify(data) }),
   getById: (id: string) => api(`/administrators/${id}`),
@@ -126,7 +114,7 @@ export const adminAPI = {
   getAll: () => api('/administrators'),
 };
 
-// Employee API
+
 export const employeeAPI = {
   create: (data: any) => api('/employees', { method: 'POST', body: JSON.stringify(data) }),
   getById: (id: string) => api(`/employees/${id}`),
@@ -135,7 +123,6 @@ export const employeeAPI = {
   getAll: () => api('/employees'),
 };
 
-// Stats API
 export const statsAPI = {
   totalSales: () => api('/stats/total-sales'),
   mostSoldProducts: () => api('/stats/most-sold-products'),
@@ -158,7 +145,6 @@ export const statsAPI = {
   dailySummary: (date: string) => api(`/stats/reports/daily-summary?date=${date}`),
 };
 
-// Invoice API
 export const invoiceAPI = {
   create: (data: any) => api('/invoices', { method: 'POST', body: JSON.stringify(data) }),
   getById: (id: string) => api(`/invoices/${id}`),
@@ -189,21 +175,16 @@ export const LoginAPI = {
       const passwordMatch = await bcrypt.compare(password, user.password);
       if (!passwordMatch) throw new Error("Contraseña incorrecta");
 
-      // Limpiar datos de sesión anteriores
       sessionStorage.removeItem("shoppingCartId");
       sessionStorage.removeItem("cart");
 
-      // Guardar usuario en sessionStorage
       sessionStorage.setItem("user", JSON.stringify(user));
       
-      // Disparar evento personalizado para actualizar UI
       window.dispatchEvent(new CustomEvent('userLogin', { detail: user }));
 
-      // Si es customer, cargar su carrito
       if (user.role === "customer") {
         try {
           const { loadCartForCurrentUser } = await import('./cart-sync');
-          // Usar setTimeout para asegurar que el usuario esté guardado antes de cargar el carrito
           setTimeout(async () => {
             try {
               await loadCartForCurrentUser();
@@ -231,14 +212,11 @@ export const RegisterAPI = {
       const user = await customerAPI.create({ ...data });
       const userWithRole = { ...(typeof user === 'object' && user !== null ? user : {}), role: "customer" };
       
-      // Limpiar datos de sesión anteriores
       sessionStorage.removeItem("shoppingCartId");
       sessionStorage.removeItem("cart");
 
-      // Guardar usuario
       sessionStorage.setItem("user", JSON.stringify(userWithRole));
       
-      // Disparar evento personalizado para actualizar UI
       window.dispatchEvent(new CustomEvent('userLogin', { detail: userWithRole }));
       
       console.log("Nuevo customer registrado, carrito se creará cuando sea necesario");

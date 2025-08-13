@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-const BASE_URL = "https://awd224062025htmlfrozonoinc.onrender.com";
+const BASE_URL = "https://awd224062025htmlfrozonoinc-1.onrender.com";
 
 function getAuthHeaders() {
   return {
@@ -130,11 +130,9 @@ export default function Dashboard() {
         </Link>
       </div>
 
-      {/* Contenido */}
       <div className="flex-1 p-6 bg-gray-100">
         <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
 
-        {/* Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div className="bg-white p-4 shadow rounded">
             <h3 className="font-semibold text-lg">Ventas Totales</h3>
@@ -162,7 +160,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Productos sin stock */}
         <div className="bg-white p-4 shadow rounded">
           <h3 className="font-semibold text-lg mb-2">Productos sin stock</h3>
           {errorMessage && <p className="text-red-500">{errorMessage}</p>}

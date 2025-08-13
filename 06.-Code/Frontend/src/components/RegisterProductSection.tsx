@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 
 export default function RegisterProductSection() {
   const [form, setForm] = useState({
-    idProduct: "",  // Agregado el campo idProduct
+    idProduct: "",  
     name: "",
     price: "",
     stock: "",
@@ -38,32 +38,28 @@ export default function RegisterProductSection() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validación de campos obligatorios
     if (!form.name || !form.price || !form.stock || !form.url) {
       toast({ title: "Faltan campos obligatorios", variant: "destructive" });
       return;
     }
-
-    // Datos del producto a enviar (similar a la edición)
     const productData = {
-      idProduct: form.idProduct,  // Asegúrate de que idProduct esté presente
+      idProduct: form.idProduct, 
       name: form.name,
-      price: parseFloat(form.price), // Convertir a número
-      stock: parseInt(form.stock), // Convertir a número
-      description: form.description || "", // Si no hay descripción, usar cadena vacía
-      categoryId: form.categoryId || null, // Si no existe categoryId, lo dejamos como null
-      url: form.url, // Asegúrate de que la URL sea válida
+      price: parseFloat(form.price), 
+      stock: parseInt(form.stock), 
+      description: form.description || "", 
+      categoryId: form.categoryId || null, 
+      url: form.url, 
     };
 
     console.log("Datos a enviar para registrar producto:", productData);
 
     try {
-      await productAPI.create(productData); // Solicitud a la API para crear el producto
+      await productAPI.create(productData); 
       toast({ title: "Producto registrado" });
-      setForm({ idProduct: "", name: "", price: "", stock: "", description: "", categoryId: "", url: "" }); // Limpiar el formulario
-      fetchProducts(); // Recargar la lista de productos
+      setForm({ idProduct: "", name: "", price: "", stock: "", description: "", categoryId: "", url: "" }); 
+      fetchProducts(); 
     } catch (err: any) {
-      // Mostrar el error detallado si ocurre algún problema
       console.error("Error al registrar producto:", err);
       toast({ title: "Error al registrar", description: err.message, variant: "destructive" });
     }
@@ -78,7 +74,7 @@ export default function RegisterProductSection() {
       stock: p.stock,
       description: p.description ?? "",
       categoryId: p.categoryId ?? "",
-      url: p.url ?? "", // Asegúrate de incluir la URL al editar
+      url: p.url ?? "",
     });
   };
 
@@ -86,22 +82,21 @@ export default function RegisterProductSection() {
     e.preventDefault();
     if (!editId) return;
 
-    // Actualizar producto con los datos del formulario
     const updatedProduct = {
-      idProduct: editForm.idProduct,  // Asegúrate de que el idProduct esté presente
+      idProduct: editForm.idProduct, 
       name: editForm.name,
       price: parseFloat(editForm.price),
       stock: parseInt(editForm.stock),
       description: editForm.description,
       categoryId: editForm.categoryId,
-      url: editForm.url, // Asegúrate de incluir también la URL en la actualización
+      url: editForm.url,
     };
 
     try {
-      await productAPI.update(editId, updatedProduct); // Actualizar el producto
+      await productAPI.update(editId, updatedProduct); 
       toast({ title: "Producto actualizado" });
       setEditId(null);
-      fetchProducts(); // Recargar la lista de productos
+      fetchProducts(); 
     } catch (err: any) {
       console.error("Error al actualizar el producto:", err);
       toast({ title: "Error al actualizar", description: err.message, variant: "destructive" });
@@ -112,7 +107,7 @@ export default function RegisterProductSection() {
     try {
       await productAPI.delete(id);
       toast({ title: "Producto eliminado" });
-      fetchProducts(); // Recargar la lista de productos
+      fetchProducts();
     } catch (err: any) {
       toast({ title: "Error al eliminar", description: err.message, variant: "destructive" });
     }

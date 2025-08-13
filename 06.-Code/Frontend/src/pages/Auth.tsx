@@ -42,14 +42,11 @@ export default function Auth() {
         description: `Bienvenido, ${user.firstName || user.email}`,
       });
 
-      // La información del usuario ya se guarda en LoginAPI.login
-      // Solo necesitamos redirigir según el rol
       if (user.role === "admin") {
         window.location.href = "/admin";
       } else if (user.role === "employee") {
         window.location.href = "/dashboard";
       } else {
-        // Customer va a la página principal
         window.location.href = "/";
       }
 
@@ -107,7 +104,6 @@ export default function Auth() {
         shippingAddress: "",
       });
 
-      // Los customers registrados van a la página principal
       setTimeout(() => {
         window.location.href = "/";
       }, 1000);
