@@ -42,11 +42,9 @@ export default function Profile() {
     setIsSaving(true);
     try {
       const updatePayload = { ...form } as any;
-      // Nunca enviamos password desde aquí
       delete updatePayload.password;
       const updated = await customerAPI.update(user._id, updatePayload);
 
-      // Actualizar sesión con los datos nuevos
       const newUser = { ...user, ...updatePayload, ...(typeof updated === "object" ? updated : {}) };
       sessionStorage.setItem("user", JSON.stringify(newUser));
       setUser(newUser);
@@ -77,7 +75,6 @@ export default function Profile() {
 
         <CardContent className="pt-6">
           <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Columna izquierda */}
             <div className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="firstName" className="text-gray-700 font-medium">Nombre</Label>
@@ -121,7 +118,6 @@ export default function Profile() {
               </div>
             </div>
 
-            {/* Columna derecha */}
             <div className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="billingAddress" className="text-gray-700 font-medium">

@@ -1,4 +1,6 @@
+
 const ShoppingCart = require('../models/shoppingCart');
+
 
 exports.create = async (req, res) => {
   try {
@@ -17,14 +19,14 @@ exports.getAll = async (req, res) => {
 };
 
 exports.getById = async (req, res) => {
-  const cart = await ShoppingCart.findOne({ idShoppingCar: req.params.id });
+  const cart = await ShoppingCart.findOne({ idShoppingCart: req.params.id });
   if (!cart) return res.status(404).json({ error: 'Not found' });
   res.json(cart);
 };
 
 exports.update = async (req, res) => {
   const cart = await ShoppingCart.findOneAndUpdate(
-    { idShoppingCar: req.params.id },
+    { idShoppingCart: req.params.id },
     req.body,
     { new: true }
   );
@@ -33,7 +35,14 @@ exports.update = async (req, res) => {
 };
 
 exports.delete = async (req, res) => {
-  const cart = await ShoppingCart.findOneAndDelete({ idShoppingCar: req.params.id });
+  const cart = await ShoppingCart.findOneAndDelete({ idShoppingCart: req.params.id });
   if (!cart) return res.status(404).json({ error: 'Not found' });
   res.json({ message: 'Deleted' });
+};
+
+exports.getByCustomer = async (req, res) => {
+  const customerId = req.params.customerId;
+  const cart = await ShoppingCart.findOne({ customer: customerId });
+  if (!cart) return res.status(404).json({ error: 'Carrito no encontrado' });
+  res.json(cart);
 };
