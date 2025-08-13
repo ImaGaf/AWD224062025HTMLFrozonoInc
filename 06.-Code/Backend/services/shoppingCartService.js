@@ -1,5 +1,6 @@
 const ShoppingCart = require('../models/shoppingCart');
 
+
 exports.createShoppingCart = async (data) => {
   const cart = new ShoppingCart(data);
   return await cart.save();
@@ -10,13 +11,13 @@ exports.getAllShoppingCarts = async () => {
 };
 
 exports.getShoppingCartById = async (id) => {
-  return await ShoppingCart.findOne({ idShoppingCar: id });
+  return await ShoppingCart.findOne({ idShoppingCart: id });
 };
 
 exports.updateShoppingCart = async (id, data) => {
-  return await ShoppingCart.findOneAndUpdate({ idShoppingCar: id }, data, { new: true });
+  return await ShoppingCart.findOneAndUpdate({ idShoppingCart: id }, data, { new: true });
 };
 
 exports.deleteShoppingCart = async (id) => {
-  return await ShoppingCart.findOneAndDelete({ idShoppingCar: id });
+  return await ShoppingCart.findOneAndDelete({ idShoppingCart: id });
 };
