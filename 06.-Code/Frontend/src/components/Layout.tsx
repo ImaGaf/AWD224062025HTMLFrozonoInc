@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cartStore } from "@/lib/cart-store";
 import { getCurrentUser, logoutUser } from "@/lib/api";
+
 interface LayoutProps {
   children: React.ReactNode;
 }
@@ -11,6 +12,7 @@ interface LayoutProps {
 export function Layout({ children }: LayoutProps) {
   const [cartCount, setCartCount] = useState(0);
   const [user, setUser] = useState<any | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const location = useLocation();
 
   useEffect(() => {
@@ -20,18 +22,46 @@ export function Layout({ children }: LayoutProps) {
 
     updateCartCount();
     const unsubscribe = cartStore.subscribe(updateCartCount);
+
     return unsubscribe;
   }, []);
 
   useEffect(() => {
-    setUser(getCurrentUser());
+    const updateUser = () => {
+      const currentUser = getCurrentUser();
+      setUser(currentUser);
+      setIsLoading(false);
+    };
+
+    updateUser();
+
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'user') {
+        updateUser();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, [location.pathname]);
 
   const isActive = (path: string) => location.pathname === path;
 
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
+      setUser(null); 
+      window.location.href = "/login";
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="sticky top-0 z-50 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60 border-b border-border">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
@@ -43,7 +73,6 @@ export function Layout({ children }: LayoutProps) {
               <span className="text-xl font-bold text-foreground">Barroco Ceramics</span>
             </Link>
 
-            {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-6">
               <Link 
                 to="/" 
@@ -64,19 +93,8 @@ export function Layout({ children }: LayoutProps) {
                 Personalizar
               </Link>
             </nav>
-
-            {/* Actions */}
+            
             <div className="flex items-center space-x-4">
-              {/* Search */}
-              <Button variant="ghost" size="icon">
-                <Search className="h-4 w-4" />
-              </Button>
-
-              {/* Wishlist */}
-              <Button variant="ghost" size="icon">
-                <Heart className="h-4 w-4" />
-              </Button>
-
               {/* Cart */}
               <Link to="/carrito">
                 <Button variant="ghost" size="icon" className="relative">
@@ -90,52 +108,44 @@ export function Layout({ children }: LayoutProps) {
               </Link>
 
               {/* User */}
-              {user ? (
-                <div className="flex items-center space-x-2">
-                  <Link
-                    to={user.role === "customer" ? "/perfil" : user.role === "admin" ? "/Admin" : "/empleados"}
-                    className="text-sm font-medium text-foreground"
-                  >
-                    Hola, {user.firstName || user.email}
+              {!isLoading && (
+                user ? (
+                  <div className="flex items-center space-x-2">
+                    <Link
+                      to={user.role === "customer" ? "/perfil" : user.role === "admin" ? "/Admin" : "/empleados"}
+                      className="text-sm font-medium text-foreground"
+                    >
+                      Hola, {user.firstName || user.email}
+                    </Link>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleLogout}
+                    >
+                      Salir
+                    </Button>
+                  </div>
+                ) : (
+                  <Link to="/login">
+                    <Button variant="ghost" size="icon">
+                      <User className="h-4 w-4" />
+                    </Button>
                   </Link>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      logoutUser();
-                      window.location.href = "/";
-                    }}
-                  >
-                    Salir
-                  </Button>
-                </div>
-              ) : (
-                <Link to="/login">
-                  <Button variant="ghost" size="icon">
-                    <User className="h-4 w-4" />
-                  </Button>
-                </Link>
+                )
               )}
-
-              {/* Mobile menu */}
-              <Button variant="ghost" size="icon" className="md:hidden">
-                <Menu className="h-4 w-4" />
-              </Button>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="flex-1">
         {children}
       </main>
 
-      {/* Footer */}
       <footer className="bg-muted mt-16">
         <div className="container mx-auto px-4 py-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {/* About */}
+
             <div>
               <h3 className="font-semibold text-foreground mb-4">Sobre Nosotros</h3>
               <p className="text-muted-foreground text-sm leading-relaxed">
@@ -144,7 +154,6 @@ export function Layout({ children }: LayoutProps) {
               </p>
             </div>
 
-            {/* Quick Links */}
             <div>
               <h3 className="font-semibold text-foreground mb-4">Enlaces Rápidos</h3>
               <ul className="space-y-2 text-sm">
@@ -155,7 +164,6 @@ export function Layout({ children }: LayoutProps) {
               </ul>
             </div>
 
-            {/* Customer Service */}
             <div>
               <h3 className="font-semibold text-foreground mb-4">Atención al Cliente</h3>
               <ul className="space-y-2 text-sm">
@@ -166,7 +174,6 @@ export function Layout({ children }: LayoutProps) {
               </ul>
             </div>
 
-            {/* Contact */}
             <div>
               <h3 className="font-semibold text-foreground mb-4">Contacto</h3>
               <div className="space-y-2 text-sm text-muted-foreground">

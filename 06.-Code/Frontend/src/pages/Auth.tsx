@@ -49,7 +49,7 @@ export default function Auth() {
       if (user.role === "admin") {
         window.location.href = "/admin";
       } else if (user.role === "employee") {
-        window.location.href = "/empleados";
+        window.location.href = "/Dashboard";
       } else {
         window.location.href = "/";
       }

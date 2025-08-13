@@ -153,7 +153,6 @@ export async function loadCartForCurrentUser(): Promise<void> {
   const customer = getCustomerIdentifier(user);
   
   if (!customer) {
-    console.log("No hay customer para cargar carrito");
     return;
   }
 
