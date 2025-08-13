@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 
-const API_BASE = "https://awd224062025htmlfrozonoinc.onrender.com/barroco";
+const API_BASE = "https://awd224062025htmlfrozonoinc-1.onrender.com/barroco";
 const authHeader = {
   "Content-Type": "application/json",
-  'Authorization': "Basic " +
-    btoa(
-      `${import.meta.env.VITE_API_USER}:${import.meta.env.VITE_API_PASS}`
-    ),
+  "Authorization":
+    "Basic " +
+    btoa(`${import.meta.env.VITE_API_USER}:${import.meta.env.VITE_API_PASS}`),
 };
 
 async function apiGet(path: string) {
@@ -17,7 +16,9 @@ async function apiGet(path: string) {
 
 const productAPI = {
   getById: async (id: string) => {
-    const res = await fetch(`${API_BASE}/products/${id}`, { headers: authHeader });
+    const res = await fetch(`${API_BASE}/products/${id}`, {
+      headers: authHeader,
+    });
     if (!res.ok) throw new Error("Error al obtener producto");
     return res.json();
   },
@@ -33,7 +34,17 @@ export default function DashboardAdmin() {
   const [categorySales, setCategorySales] = useState<any[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>("");
 
-  // Top Customers
+  useEffect(() => {
+    getTopCustomers();
+    getMonthlyIncome();
+    getTotalSales();
+    getLowStockProducts();
+    getMostSoldProducts();
+    getLoyalCustomers();
+    getCategorySales();
+  }, []);
+
+  // API calls
   const getTopCustomers = async () => {
     try {
       const data = await apiGet("/stats/top-customers");
@@ -43,7 +54,6 @@ export default function DashboardAdmin() {
     }
   };
 
-  // Monthly Income
   const getMonthlyIncome = async () => {
     try {
       const data = await apiGet("/stats/monthly-income");
@@ -53,7 +63,6 @@ export default function DashboardAdmin() {
     }
   };
 
-  // Total Sales
   const getTotalSales = async () => {
     try {
       const data = await apiGet("/stats/total-sales");
@@ -63,7 +72,6 @@ export default function DashboardAdmin() {
     }
   };
 
-  // Low Stock Products
   const getLowStockProducts = async () => {
     try {
       setErrorMessage("");
@@ -101,7 +109,6 @@ export default function DashboardAdmin() {
     }
   };
 
-  // Most Sold Products
   const getMostSoldProducts = async () => {
     try {
       const data = await apiGet("/stats/most-sold-products");
@@ -111,7 +118,6 @@ export default function DashboardAdmin() {
     }
   };
 
-  // Loyal Customers
   const getLoyalCustomers = async () => {
     try {
       const data = await apiGet("/stats/top-customers");
@@ -121,7 +127,6 @@ export default function DashboardAdmin() {
     }
   };
 
-  // Category Sales
   const getCategorySales = async () => {
     try {
       const data = await apiGet("/stats/category-sales");
@@ -131,53 +136,54 @@ export default function DashboardAdmin() {
     }
   };
 
-  useEffect(() => {
-    getTopCustomers();
-    getMonthlyIncome();
-    getTotalSales();
-    getLowStockProducts();
-    getMostSoldProducts();
-    getLoyalCustomers();
-    getCategorySales();
-  }, []);
-
   return (
     <div className="flex min-h-screen">
-      {/* Main content */}
       <div className="flex-1 p-6 bg-gray-100">
         <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
 
-        {/* Cards */}
+        {/* Cards principales */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="bg-white p-4 shadow rounded">
+          {/* Total Ventas */}
+          <div className="bg-white p-4 rounded-2xl shadow-md">
             <h3 className="font-semibold text-lg">Ventas Totales</h3>
             <p className="text-2xl font-bold text-green-600">
               ${totalSales.toFixed(2)}
             </p>
           </div>
 
-          <div className="bg-white p-4 shadow rounded">
+          {/* Top Clientes */}
+          <div className="bg-white p-4 rounded-2xl shadow-md">
             <h3 className="font-semibold text-lg">Top Clientes</h3>
-            {topCustomers.map((c) => (
-              <p key={c.idCustomer}>
-                ID: {c.idCustomer} — Nombre: {c.firstName} {c.lastName} —{" "}
-                <span className="font-bold">${c.totalSpent}</span>
-              </p>
-            ))}
+            {topCustomers.length > 0 ? (
+              topCustomers.map((c) => (
+                <p
+                  key={c.idCustomer}
+                  className="text-green-600 font-bold"
+                >
+                  ID: {c.idCustomer} — {c.firstName} {c.lastName} — ${c.totalSpent.toFixed(2)}
+                </p>
+              ))
+            ) : (
+              <p className="text-gray-500">No hay datos de clientes</p>
+            )}
           </div>
 
-          <div className="bg-white p-4 shadow rounded">
+          {/* Ingresos Mensuales */}
+          <div className="bg-white p-4 rounded-2xl shadow-md">
             <h3 className="font-semibold text-lg">Ingresos Mensuales</h3>
             {monthlyIncome.map((m) => (
-              <p key={m.month}>
-                {m.month} — <span className="font-bold">${m.total}</span>
+              <p
+                key={m.month}
+                className="text-green-600 font-bold"
+              >
+                {m.month} — ${m.total}
               </p>
             ))}
           </div>
         </div>
 
         {/* Productos más vendidos */}
-        <div className="bg-white p-4 shadow rounded mb-6">
+        <div className="bg-white p-4 rounded-2xl shadow-md mb-6">
           <h3 className="font-semibold text-lg mb-2">Productos Más Vendidos</h3>
           {mostSoldProducts.length > 0 ? (
             <ul className="list-disc pl-5">
@@ -188,12 +194,12 @@ export default function DashboardAdmin() {
               ))}
             </ul>
           ) : (
-            <p>No hay productos más vendidos disponibles</p>
+            <p>No hay productos más vendidos</p>
           )}
         </div>
 
         {/* Productos sin stock */}
-        <div className="bg-white p-4 shadow rounded mb-6">
+        <div className="bg-white p-4 rounded-2xl shadow-md mb-6">
           <h3 className="font-semibold text-lg mb-2">Productos sin stock</h3>
           {errorMessage && <p className="text-red-500">{errorMessage}</p>}
           {lowStockProducts.length > 0 ? (
@@ -208,35 +214,38 @@ export default function DashboardAdmin() {
         </div>
 
         {/* Clientes Leales */}
-        <div className="bg-white p-4 shadow rounded mb-6">
+        <div className="bg-white p-4 rounded-2xl shadow-md mb-6">
           <h3 className="font-semibold text-lg mb-2">Clientes Más Leales</h3>
           {loyalCustomers.length > 0 ? (
-            <ul className="list-disc pl-5">
-              {loyalCustomers.map((c) => (
-                <li key={c.customerId}>
-                  {c.name} - ${c.totalSpent}
-                </li>
-              ))}
-            </ul>
+            loyalCustomers.map((c) => (
+              <p
+                key={c.idCustomer}
+                className="text-green-600 font-bold"
+              >
+                ID: {c.idCustomer} — {c.firstName} {c.lastName} — ${c.totalSpent.toFixed(2)}
+              </p>
+            ))
           ) : (
-            <p>No hay clientes leales disponibles</p>
+            <p className="text-gray-500">No hay clientes leales</p>
           )}
         </div>
 
         {/* Ventas por Categoría */}
-        <div className="bg-white p-4 shadow rounded">
+        <div className="bg-white p-4 rounded-2xl shadow-md">
           <h3 className="font-semibold text-lg mb-2">Ventas por Categoría</h3>
           {categorySales.length > 0 ? (
             <ul className="list-disc pl-5">
               {categorySales.map((category) => (
                 <li key={category.category}>
                   {category.category}:{" "}
-                  <span className="font-bold">${category.sales}</span>
+                  <span className="font-bold text-gray-900">
+                    ${category.sales}
+                  </span>
                 </li>
               ))}
             </ul>
           ) : (
-            <p>No hay ventas por categoría disponibles</p>
+            <p>No hay ventas por categoría</p>
           )}
         </div>
       </div>

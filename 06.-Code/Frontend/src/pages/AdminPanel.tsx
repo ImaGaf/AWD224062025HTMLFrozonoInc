@@ -17,7 +17,6 @@ export default function AdminPanel() {
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-      {/* Sidebar fijo */}
       <div className="w-60 bg-gray-800 text-white flex flex-col p-4">
         <h2 className="text-lg font-bold mb-6">Menú</h2>
         <Link
@@ -85,7 +84,6 @@ export default function AdminPanel() {
         </Link>
       </div>
 
-      {/* Contenido */}
       <div className="flex-1 p-6">
         <Card>
           <CardHeader>

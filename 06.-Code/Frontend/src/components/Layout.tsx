@@ -23,9 +23,7 @@ export function Layout({ children }: LayoutProps) {
     updateCartCount();
     const unsubscribe = cartStore.subscribe(updateCartCount);
 
-    // Escuchar eventos personalizados para actualizar el carrito
     const handleUserLogin = () => {
-      // Pequeño delay para asegurar que el carrito se haya cargado
       setTimeout(updateCartCount, 200);
     };
 
@@ -57,8 +55,6 @@ export function Layout({ children }: LayoutProps) {
     };
 
     updateUser();
-
-    // Escuchar cambios en sessionStorage para actualizar el estado del usuario
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'user') {
         updateUser();
@@ -77,7 +73,7 @@ export function Layout({ children }: LayoutProps) {
   const handleLogout = async () => {
     try {
       await logoutUser();
-      setUser(null); // Actualizar el estado inmediatamente
+      setUser(null);
       window.location.href = "/login";
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
@@ -97,9 +93,7 @@ export function Layout({ children }: LayoutProps) {
               <span className="text-xl font-bold text-foreground">Barroco Ceramics</span>
             </Link>
 
-            {/* Navegación condicional según el rol del usuario */}
             <nav className="hidden md:flex items-center space-x-6">
-              {/* Solo mostrar navegación pública si no es admin o employee */}
               {(!user || user.role === "customer") && (
                 <>
                   <Link 
@@ -122,8 +116,6 @@ export function Layout({ children }: LayoutProps) {
                   </Link>
                 </>
               )}
-              
-              {/* Navegación para Admin */}
               {user?.role === "admin" && (
                 <>
                   <Link 
@@ -134,8 +126,7 @@ export function Layout({ children }: LayoutProps) {
                   </Link>
                 </>
               )}
-              
-              {/* Navegación para Employee */}
+            
               {user?.role === "employee" && (
                 <>
                   <Link 
@@ -149,7 +140,6 @@ export function Layout({ children }: LayoutProps) {
             </nav>
             
             <div className="flex items-center space-x-4">
-              {/* Cart - Solo para customers y usuarios no logueados */}
               {(!user || user.role === "customer") && (
                 <Link to="/carrito">
                   <Button variant="ghost" size="icon" className="relative">
@@ -162,8 +152,6 @@ export function Layout({ children }: LayoutProps) {
                   </Button>
                 </Link>
               )}
-
-              {/* User */}
               {!isLoading && (
                 user ? (
                   <div className="flex items-center space-x-2">
