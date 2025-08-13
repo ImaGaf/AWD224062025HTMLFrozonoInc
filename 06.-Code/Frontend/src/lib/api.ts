@@ -3,13 +3,10 @@ import bcrypt from 'bcryptjs';
 const BASE_URL = 'https://awd224062025htmlfrozonoinc.onrender.com/barroco';
 
 async function api<T>(endpoint: string, options?: RequestInit): Promise<T> {
-  const username = "frozono";  
-  const password = "trabatrix2"; 
-  const credentials = btoa(`${username}:${password}`);
   const response = await fetch(`${BASE_URL}${endpoint}`, {
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Basic ${credentials}`,
+      'Authorization': `Basic ${btoa("frozono:trabatrix2")}`,
       ...options?.headers,
     },
     ...options,
