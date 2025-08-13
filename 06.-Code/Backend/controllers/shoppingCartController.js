@@ -39,3 +39,10 @@ exports.delete = async (req, res) => {
   if (!cart) return res.status(404).json({ error: 'Not found' });
   res.json({ message: 'Deleted' });
 };
+
+exports.getByCustomer = async (req, res) => {
+  const customerId = req.params.customerId;
+  const cart = await ShoppingCart.findOne({ customer: customerId });
+  if (!cart) return res.status(404).json({ error: 'Carrito no encontrado' });
+  res.json(cart);
+};
