@@ -11,15 +11,13 @@ export default function ProductPage() {
   //const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // Buscadores
-  const [searchId, setSearchId] = useState(""); // buscar por _id (va a llamar a getById)
-  const [searchName, setSearchName] = useState(""); // filtro local por nombre/id
+
+  const [searchId, setSearchId] = useState("");
+  const [searchName, setSearchName] = useState("");
   const [products, setProducts] = useState([]);
   const [errorMessage, setErrorMessage] = useState("");
-  // Edición
   const [editingProduct, setEditingProduct] = useState<{ id: string; price: number; stock: number } | null>(null);
 
-  // ---- Helpers para cargar datos ----
   const fetchProducts = async () => {
     setLoading(true);
     try {
@@ -53,18 +51,16 @@ export default function ProductPage() {
       return;
     }
 
-    // Filtrar solo stock 0
+
     const outOfStockIds = data
       .filter((item: any) => Number(item.stock) === 0)
       .map((item: any) => item.productId);
 
-    // Si no hay, limpiar lista
     if (outOfStockIds.length === 0) {
       setProducts([]);
       return;
     }
 
-    // Llamadas paralelas para traer info completa
     const productDetails = await Promise.all(
       outOfStockIds.map(async (id) => {
         try {
@@ -75,7 +71,6 @@ export default function ProductPage() {
       })
     );
 
-    // Filtrar nulos
     const safeData = productDetails.filter((p) => p !== null);
 
     setProducts(safeData);
@@ -131,7 +126,6 @@ export default function ProductPage() {
       await productAPI.update(editingProduct.id, { price, stock });
       toast({ title: "Producto actualizado", description: "Cambios guardados correctamente" });
 
-      // refrescar lista (trae todos)
       await fetchProducts();
       setEditingProduct(null);
     } catch (error) {
@@ -142,7 +136,6 @@ export default function ProductPage() {
     }
   };
 
-  // Filtrar por nombre / id en memoria (cuando se muestran varios productos)
   const filteredProducts = products.filter((p) => {
     const term = searchName.trim().toLowerCase();
     if (!term) return true;
@@ -153,7 +146,6 @@ export default function ProductPage() {
     );
   });
 
-  // ---- Render ----
   return (
     <div className="min-h-screen bg-gradient-to-br from-cornsilk via-warm to-accent p-6">
       <Card className="max-w-4xl mx-auto bg-card/95 backdrop-blur">
@@ -205,7 +197,6 @@ export default function ProductPage() {
                 >
                   <div className="flex gap-4">
                     {product.url ? (
-                      // mostrar imagen si existe (usar optional chaining para seguridad)
                       <img src={product.url} alt={product.name ?? "producto"} className="w-20 h-20 object-cover rounded" />
                     ) : (
                       <div className="w-20 h-20 bg-gray-100 rounded flex items-center justify-center text-sm text-muted-foreground">Sin imagen</div>
