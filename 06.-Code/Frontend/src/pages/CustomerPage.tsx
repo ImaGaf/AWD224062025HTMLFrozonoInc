@@ -135,7 +135,11 @@ export default function CustomersPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-cornsilk via-warm to-accent p-6">
-      {/* Sidebar fijo */}
+      <Card className="max-w-5xl mx-auto bg-card/95 backdrop-blur">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold">Gestión de Clientes</CardTitle>
+        </CardHeader>
+              {/* Sidebar fijo */}
               <div className="w-60 bg-gray-800 text-white flex flex-col p-4">
                 <h2 className="text-lg font-bold mb-6">Menú</h2>
                 <Link to="/dashboard" className="mb-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded">
@@ -151,11 +155,6 @@ export default function CustomersPage() {
                   Ordenes
                 </Link>
               </div>
-      <Card className="max-w-5xl mx-auto bg-card/95 backdrop-blur">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold">Gestión de Clientes</CardTitle>
-        </CardHeader>
-              
 
         <CardContent>
           {/* Formulario de creación */}
