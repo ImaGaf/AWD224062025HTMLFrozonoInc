@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-const USERNAME = "frozono";
-const PASSWORD = "trabatrix2";
 const BASE_URL = "https://awd224062025htmlfrozonoinc.onrender.com";
 
 function getAuthHeaders() {
-  const credentials = btoa(`${USERNAME}:${PASSWORD}`);
   return {
     "Content-Type": "application/json",
-    "Authorization": `Basic ${credentials}`
+    'Authorization':     "Basic " +
+    btoa(
+      `${import.meta.env.VITE_API_USER}:${import.meta.env.VITE_API_PASS}`
+    ),
   };
 }
 

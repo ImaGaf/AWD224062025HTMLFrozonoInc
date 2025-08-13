@@ -1,11 +1,23 @@
 import React, { useEffect, useState } from "react";
 
-// Simulación de productAPI.getById (reemplázalo con tu import real)
+const API_BASE = "https://awd224062025htmlfrozonoinc.onrender.com/barroco";
+const authHeader = {
+  "Content-Type": "application/json",
+  'Authorization': "Basic " +
+    btoa(
+      `${import.meta.env.VITE_API_USER}:${import.meta.env.VITE_API_PASS}`
+    ),
+};
+
+async function apiGet(path: string) {
+  const res = await fetch(`${API_BASE}${path}`, { headers: authHeader });
+  if (!res.ok) throw new Error(`Error al obtener ${path}`);
+  return res.json();
+}
+
 const productAPI = {
   getById: async (id: string) => {
-    const res = await fetch(
-      `https://awd224062025htmlfrozonoinc.onrender.com/barroco/products/${id}`
-    );
+    const res = await fetch(`${API_BASE}/products/${id}`, { headers: authHeader });
     if (!res.ok) throw new Error("Error al obtener producto");
     return res.json();
   },
@@ -24,11 +36,7 @@ export default function DashboardAdmin() {
   // Top Customers
   const getTopCustomers = async () => {
     try {
-      const res = await fetch(
-        "https://awd224062025htmlfrozonoinc.onrender.com/barroco/stats/top-customers"
-      );
-      if (!res.ok) throw new Error("Error al obtener top customers");
-      const data = await res.json();
+      const data = await apiGet("/stats/top-customers");
       setTopCustomers(data.topCustomers || []);
     } catch (error) {
       console.error(error);
@@ -38,11 +46,7 @@ export default function DashboardAdmin() {
   // Monthly Income
   const getMonthlyIncome = async () => {
     try {
-      const res = await fetch(
-        "https://awd224062025htmlfrozonoinc.onrender.com/barroco/stats/monthly-income"
-      );
-      if (!res.ok) throw new Error("Error al obtener ingresos mensuales");
-      const data = await res.json();
+      const data = await apiGet("/stats/monthly-income");
       setMonthlyIncome(data.monthlyIncome || []);
     } catch (error) {
       console.error(error);
@@ -52,11 +56,7 @@ export default function DashboardAdmin() {
   // Total Sales
   const getTotalSales = async () => {
     try {
-      const res = await fetch(
-        "https://awd224062025htmlfrozonoinc.onrender.com/barroco/stats/total-sales"
-      );
-      if (!res.ok) throw new Error("Error al obtener ventas totales");
-      const data = await res.json();
+      const data = await apiGet("/stats/total-sales");
       setTotalSales(data.totalSales || 0);
     } catch (error) {
       console.error(error);
@@ -67,12 +67,8 @@ export default function DashboardAdmin() {
   const getLowStockProducts = async () => {
     try {
       setErrorMessage("");
-      const res = await fetch(
-        "https://awd224062025htmlfrozonoinc.onrender.com/barroco/stats/product/low-stock"
-      );
-      if (!res.ok) throw new Error("Error al obtener productos sin stock");
+      const data = await apiGet("/stats/product/low-stock");
 
-      const data = await res.json();
       if (!Array.isArray(data)) {
         setErrorMessage("Formato de datos inválido");
         return;
@@ -108,11 +104,7 @@ export default function DashboardAdmin() {
   // Most Sold Products
   const getMostSoldProducts = async () => {
     try {
-      const res = await fetch(
-        "https://awd224062025htmlfrozonoinc.onrender.com/barroco/stats/most-sold-products"
-      );
-      if (!res.ok) throw new Error("Error al obtener productos más vendidos");
-      const data = await res.json();
+      const data = await apiGet("/stats/most-sold-products");
       setMostSoldProducts(data.mostSoldProducts || []);
     } catch (error) {
       console.error(error);
@@ -122,11 +114,7 @@ export default function DashboardAdmin() {
   // Loyal Customers
   const getLoyalCustomers = async () => {
     try {
-      const res = await fetch(
-        "https://awd224062025htmlfrozonoinc.onrender.com/barroco/stats/top-customers"
-      );
-      if (!res.ok) throw new Error("Error al obtener clientes leales");
-      const data = await res.json();
+      const data = await apiGet("/stats/top-customers");
       setLoyalCustomers(data.topCustomers || []);
     } catch (error) {
       console.error(error);
@@ -136,11 +124,7 @@ export default function DashboardAdmin() {
   // Category Sales
   const getCategorySales = async () => {
     try {
-      const res = await fetch(
-        "https://awd224062025htmlfrozonoinc.onrender.com/barroco/stats/category-sales"
-      );
-      if (!res.ok) throw new Error("Error al obtener ventas por categoría");
-      const data = await res.json();
+      const data = await apiGet("/stats/category-sales");
       setCategorySales(data.categorySales || []);
     } catch (error) {
       console.error(error);
@@ -167,15 +151,16 @@ export default function DashboardAdmin() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div className="bg-white p-4 shadow rounded">
             <h3 className="font-semibold text-lg">Ventas Totales</h3>
-            <p className="text-2xl font-bold text-green-600">${totalSales.toFixed(2)}</p>
+            <p className="text-2xl font-bold text-green-600">
+              ${totalSales.toFixed(2)}
+            </p>
           </div>
 
           <div className="bg-white p-4 shadow rounded">
             <h3 className="font-semibold text-lg">Top Clientes</h3>
             {topCustomers.map((c) => (
               <p key={c.idCustomer}>
-                ID: {c.idCustomer} —{" "}
-                Nombre: {c.firstName} {c.lastName} —{" "}
+                ID: {c.idCustomer} — Nombre: {c.firstName} {c.lastName} —{" "}
                 <span className="font-bold">${c.totalSpent}</span>
               </p>
             ))}
@@ -197,7 +182,9 @@ export default function DashboardAdmin() {
           {mostSoldProducts.length > 0 ? (
             <ul className="list-disc pl-5">
               {mostSoldProducts.map((p) => (
-                <li key={p._id}>{p.name} - {p.totalSold}</li>
+                <li key={p._id}>
+                  {p.name} - {p.totalSold}
+                </li>
               ))}
             </ul>
           ) : (
@@ -226,7 +213,9 @@ export default function DashboardAdmin() {
           {loyalCustomers.length > 0 ? (
             <ul className="list-disc pl-5">
               {loyalCustomers.map((c) => (
-                <li key={c.customerId}>{c.name} - ${c.totalSpent}</li>
+                <li key={c.customerId}>
+                  {c.name} - ${c.totalSpent}
+                </li>
               ))}
             </ul>
           ) : (
@@ -241,7 +230,8 @@ export default function DashboardAdmin() {
             <ul className="list-disc pl-5">
               {categorySales.map((category) => (
                 <li key={category.category}>
-                  {category.category}: <span className="font-bold">${category.sales}</span>
+                  {category.category}:{" "}
+                  <span className="font-bold">${category.sales}</span>
                 </li>
               ))}
             </ul>
