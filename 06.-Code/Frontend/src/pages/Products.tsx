@@ -19,14 +19,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Star, Search, Filter, ShoppingCart, Heart } from "lucide-react";
-import { productAPI, categoryAPI } from "@/lib/api";
+import { productAPI, categoryAPI, getCurrentUser } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { cartStore } from "@/lib/cart-store";
+import { ensureCartExists, upsertCartForCurrentUser } from "@/lib/cart-sync";
 
 export default function Products() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("name");
+  const [isAddingToCart, setIsAddingToCart] = useState<string | null>(null);
   const { toast } = useToast();
 
   const { data: products, isLoading: productsLoading } = useQuery({
@@ -63,23 +65,72 @@ export default function Products() {
       }
     });
 
-  const addToCart = (product: any) => {
-    const cartItem = {
-      id: `${product.idProduct || `temp-${Date.now()}`}-${Date.now()}`,
-      productId: product.idProduct || `temp-${Date.now()}`,
-      name: product.name || "Producto",
-      price: product.price || 29.99,
-      quantity: 1,
-    };
+  const addToCart = async (product: any) => {
+    const user = getCurrentUser();
     
-    cartStore.addItem(cartItem);
-    sessionStorage.setItem("cart", JSON.stringify(cartStore.getItems()));
+    if (!user || user.role !== "customer") {
+      toast({
+        title: "Error",
+        description: "Debes iniciar sesión como cliente para agregar productos al carrito",
+        variant: "destructive",
+      });
+      return;
+    }
 
-    toast({
-      title: "Producto agregado",
-      description: `${product.name} se ha añadido al carrito`,
+    const productId = product.idProduct || `temp-${Date.now()}`;
+    setIsAddingToCart(productId);
 
-    });
+    try {
+      console.log("Agregando producto al carrito:", product);
+      const cartId = await ensureCartExists();
+      
+      if (!cartId) {
+        throw new Error("No se pudo crear o encontrar carrito");
+      }
+
+      console.log("Carrito asegurado con ID:", cartId);
+
+
+      const cartItem = {
+        id: `${productId}-${Date.now()}`,
+        productId: productId,
+        name: product.name || "Producto",
+        price: product.price || 29.99,
+        quantity: 1,
+      };
+      
+      cartStore.addItem(cartItem);
+      console.log("Producto agregado al store local:", cartItem);
+      
+      await upsertCartForCurrentUser();
+      console.log("Carrito sincronizado con backend");
+
+      sessionStorage.setItem("cart", JSON.stringify(cartStore.getItems()));
+
+      toast({
+        title: "Producto agregado",
+        description: `${product.name} se ha añadido al carrito`,
+      });
+    } catch (error) {
+      console.error("Error al agregar al carrito:", error);
+    
+      const items = cartStore.getItems();
+      const itemToRemove = items.find(item => 
+        item.productId === productId && 
+        item.id.includes(`${productId}-`)
+      );
+      if (itemToRemove) {
+        cartStore.removeItem(itemToRemove.id);
+      }
+      
+      toast({
+        title: "Error",
+        description: "No se pudo agregar el producto al carrito. Intenta de nuevo.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAddingToCart(null);
+    }
   };
 
   const addToWishlist = (product: any) => {
@@ -142,7 +193,6 @@ export default function Products() {
               />
             </div>
 
-            {/* Category Filter */}
             <Select
               value={selectedCategory}
               onValueChange={(value) => setSelectedCategory(value)}
@@ -153,14 +203,13 @@ export default function Products() {
               <SelectContent>
                 <SelectItem value="all">Todas las categorías</SelectItem>
                 {categoryList.map((category: any) => (
-                  <SelectItem key={category.idCategory} value={category.idCategory}>
+                  <SelectItem key={category.categoryID} value={category.idCategory}>
                     {category.name}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
 
-            {/* Sort */}
             <Select value={sortBy} onValueChange={(value) => setSortBy(value)}>
               <SelectTrigger>
                 <SelectValue placeholder="Ordenar por" />
@@ -172,7 +221,6 @@ export default function Products() {
               </SelectContent>
             </Select>
 
-            {/* Filter Button */}
             <Button
               variant="outline"
               className="border-ceramics text-ceramics hover:bg-ceramics hover:text-ceramics-foreground"
@@ -183,7 +231,6 @@ export default function Products() {
           </div>
         </div>
 
-        {/* Results Count */}
         <div className="mb-6">
           <p className="text-muted-foreground">
             Mostrando {filteredProducts.length} productos
@@ -192,119 +239,131 @@ export default function Products() {
           </p>
         </div>
 
-        {/* Products Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredProducts.map((product: any, index: number) => (
-            <Card
-              key={product.idProduct || index}
-              className="group cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 bg-gradient-to-b from-card to-card/50 border-0 shadow-lg overflow-hidden"
-            >
-              <CardHeader className="p-0">
-                <div className="aspect-[4/3] rounded-t-lg relative overflow-hidden">
-                  <img
-                    src={product.url || "https://via.placeholder.com/400x300?text=Sin+Imagen"}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src =
-                        "https://via.placeholder.com/400x300?text=Sin+Imagen";
-                    }}
-                  />
-                  <div className="absolute top-4 left-4 flex flex-col gap-2">
-                    <Badge className="bg-ceramics hover:bg-ceramics/90 text-ceramics-foreground shadow-lg">
-                      Artesanal
-                    </Badge>
-                    {product.customizationAvailable && (
-                      <Badge
-                        variant="secondary"
-                        className="bg-white/90 text-foreground shadow-lg"
-                      >
-                        Personalizable
+          {filteredProducts.map((product: any, index: number) => {
+            const productId = product.idProduct || `temp-${index}`;
+            const isLoading = isAddingToCart === productId;
+            
+            return (
+              <Card
+                key={productId}
+                className="group cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 bg-gradient-to-b from-card to-card/50 border-0 shadow-lg overflow-hidden"
+              >
+                <CardHeader className="p-0">
+                  <div className="aspect-[4/3] rounded-t-lg relative overflow-hidden">
+                    <img
+                      src={product.url || "https://via.placeholder.com/400x300?text=Sin+Imagen"}
+                      alt={product.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src =
+                          "https://via.placeholder.com/400x300?text=Sin+Imagen";
+                      }}
+                    />
+                    <div className="absolute top-4 left-4 flex flex-col gap-2">
+                      <Badge className="bg-ceramics hover:bg-ceramics/90 text-ceramics-foreground shadow-lg">
+                        Artesanal
                       </Badge>
-                    )}
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="absolute top-4 right-4 bg-white/90 hover:bg-white text-foreground shadow-lg backdrop-blur-sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      addToWishlist(product);
-                    }}
-                  >
-                    <Heart className="h-5 w-5" />
-                  </Button>
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
-                    <div className="flex items-center text-white/90">
-                      <div className="flex text-yellow-300">
-                        {[...Array(5)].map((_, i) => (
-                          <Star key={i} className="h-4 w-4 fill-current" />
-                        ))}
+                      {product.customizationAvailable && (
+                        <Badge
+                          variant="secondary"
+                          className="bg-white/90 text-foreground shadow-lg"
+                        >
+                          Personalizable
+                        </Badge>
+                      )}
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="absolute top-4 right-4 bg-white/90 hover:bg-white text-foreground shadow-lg backdrop-blur-sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        addToWishlist(product);
+                      }}
+                    >
+                      <Heart className="h-5 w-5" />
+                    </Button>
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
+                      <div className="flex items-center text-white/90">
+                        <div className="flex text-yellow-300">
+                          {[...Array(5)].map((_, i) => (
+                            <Star key={i} className="h-4 w-4 fill-current" />
+                          ))}
+                        </div>
+                        <span className="text-sm ml-2">(4.9)</span>
                       </div>
-                      <span className="text-sm ml-2">(4.9)</span>
                     </div>
                   </div>
-                </div>
-              </CardHeader>
-              <CardContent className="p-6">
-                <CardTitle className="text-xl mb-3 line-clamp-2 text-foreground font-semibold">
-                  {product.name || `Producto Artesanal ${index + 1}`}
-                </CardTitle>
-                <CardDescription className="text-muted-foreground mb-4 line-clamp-3 leading-relaxed">
-                  {product.description ||
-                    "Hermosa pieza de cerámica hecha a mano con técnicas tradicionales. Cada producto es único y especial, creado con amor y dedicación por nuestros artesanos."}
-                </CardDescription>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex flex-col">
-                    <span className="text-2xl font-bold text-ceramics">
-                      ${product.price || "29.99"}
-                    </span>
-                    <span className="text-sm text-muted-foreground">
-                      Precio por unidad
-                    </span>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <CardTitle className="text-xl mb-3 line-clamp-2 text-foreground font-semibold">
+                    {product.name || `Producto Artesanal ${index + 1}`}
+                  </CardTitle>
+                  <CardDescription className="text-muted-foreground mb-4 line-clamp-3 leading-relaxed">
+                    {product.description ||
+                      "Hermosa pieza de cerámica hecha a mano con técnicas tradicionales. Cada producto es único y especial, creado con amor y dedicación por nuestros artesanos."}
+                  </CardDescription>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex flex-col">
+                      <span className="text-2xl font-bold text-ceramics">
+                        ${product.price || "29.99"}
+                      </span>
+                      <span className="text-sm text-muted-foreground">
+                        Precio por unidad
+                      </span>
+                    </div>
+                    <Badge
+                      variant={
+                        product.stock > 10
+                          ? "default"
+                          : product.stock > 0
+                            ? "secondary"
+                            : "destructive"
+                      }
+                      className="px-3 py-1"
+                    >
+                      {product.stock > 0 ? `${product.stock} disponibles` : "Agotado"}
+                    </Badge>
                   </div>
-                  <Badge
-                    variant={
-                      product.stock > 10
-                        ? "default"
-                        : product.stock > 0
-                          ? "secondary"
-                          : "destructive"
-                    }
-                    className="px-3 py-1"
+                  <div className="text-sm text-muted-foreground mb-4 p-2 bg-muted/50 rounded-lg">
+                    <span className="font-medium">Categoría:</span>{" "}
+                    {categoryList.find(
+                      (cat) => cat.idCategory === product.category
+                    )?.name || "Cerámica General"}
+                  </div>
+                </CardContent>
+                <CardFooter className="p-6 pt-0 flex gap-3">
+                  <Button
+                    className="flex-1 bg-ceramics hover:bg-ceramics/90 text-ceramics-foreground h-12 text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+                    disabled={product.stock === 0 || isLoading}
+                    onClick={() => addToCart(product)}
                   >
-                    {product.stock > 0 ? `${product.stock} disponibles` : "Agotado"}
-                  </Badge>
-                </div>
-                <div className="text-sm text-muted-foreground mb-4 p-2 bg-muted/50 rounded-lg">
-                  <span className="font-medium">Categoría:</span>{" "}
-                  {categoryList.find(
-                    (cat) => cat.idCategory === product.category
-                  )?.name || "Cerámica General"}
-                </div>
-              </CardContent>
-              <CardFooter className="p-6 pt-0 flex gap-3">
-                <Button
-                  className="flex-1 bg-ceramics hover:bg-ceramics/90 text-ceramics-foreground h-12 text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300"
-                  disabled={product.stock === 0}
-                  onClick={() => addToCart(product)}
-                >
-                  <ShoppingCart className="h-5 w-5 mr-2" />
-                  Agregar al Carrito
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-12 w-12 border-ceramics text-ceramics hover:bg-ceramics hover:text-ceramics-foreground"
-                >
-                  <span className="text-lg">👁️</span>
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
+                    {isLoading ? (
+                      <>
+                        <div className="h-5 w-5 mr-2 animate-spin rounded-full border-2 border-ceramics-foreground border-t-transparent"></div>
+                        Agregando...
+                      </>
+                    ) : (
+                      <>
+                        <ShoppingCart className="h-5 w-5 mr-2" />
+                        Agregar al Carrito
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-12 w-12 border-ceramics text-ceramics hover:bg-ceramics hover:text-ceramics-foreground"
+                  >
+                    <span className="text-lg">👁️</span>
+                  </Button>
+                </CardFooter>
+              </Card>
+            );
+          })}
         </div>
 
-        {/* No Results */}
         {filteredProducts.length === 0 && (
           <div className="text-center py-12">
             <div className="text-6xl mb-4">🔍</div>

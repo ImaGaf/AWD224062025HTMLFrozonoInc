@@ -127,7 +127,6 @@ const handleRegister = async (e: React.FormEvent) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-cornsilk via-warm to-accent flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {/* Logo */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center space-x-2">
             <div className="w-10 h-10 bg-ceramics rounded-lg flex items-center justify-center">
@@ -151,7 +150,6 @@ const handleRegister = async (e: React.FormEvent) => {
                 <TabsTrigger value="register">Registrarse</TabsTrigger>
               </TabsList>
 
-              {/* Login Tab */}
               <TabsContent value="login" className="space-y-4">
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div className="space-y-2">
@@ -191,7 +189,6 @@ const handleRegister = async (e: React.FormEvent) => {
                 </div>
               </TabsContent>
 
-              {/* Register Tab */}
               <TabsContent value="register" className="space-y-4">
                 <form onSubmit={handleRegister} className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">

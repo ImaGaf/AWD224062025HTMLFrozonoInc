@@ -1,5 +1,4 @@
 import bcrypt from 'bcryptjs';
-import { loadCartForCurrentUser } from './cart-sync';
 
 const BASE_URL = 'https://awd224062025htmlfrozonoinc.onrender.com/barroco';
 
@@ -28,7 +27,9 @@ export const getCurrentUser = (): any | null => {
   }
 };
 
-export const logoutUser = () => {
+export const logoutUser = async () => {
+  const { clearUserCart } = await import('./cart-sync');
+  await clearUserCart();
   sessionStorage.removeItem("user");
 };
 
@@ -50,12 +51,13 @@ export const productAPI = {
   delete: (id: string) => api(`/products/${id}`, { method: 'DELETE' }),
 };
 
-// Cart API
+// Cart API - Agregamos getByCustomer
 export const cartAPI = {
   create: (data: any) => api('/shoppingCart', { method: 'POST', body: JSON.stringify(data) }),
   getById: (id: string) => api(`/shoppingCart/${id}`),
   update: (id: string, data: any) => api(`/shoppingCart/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   delete: (id: string) => api(`/shoppingCart/${id}`, { method: 'DELETE' }),
+  getByCustomer: (customerId: string) => api(`/shoppingCart/customer/${customerId}`),
 };
 
 // Cart Items API
@@ -140,7 +142,6 @@ export const invoiceAPI = {
   delete: (id: string) => api(`/invoices/${id}`, { method: 'DELETE' }),
 };
 
-// Login API
 export const LoginAPI = {
   login: async (email: string, password: string) => {
     const adminsRaw = await adminAPI.getAll().catch(() => []);
@@ -163,12 +164,23 @@ export const LoginAPI = {
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) throw new Error("Contraseña incorrecta");
 
-    // Guardar sesión
+    sessionStorage.removeItem("shoppingCartId");
+    sessionStorage.removeItem("cart");
+
     sessionStorage.setItem("user", JSON.stringify(user));
     
-    
     if (user.role === "customer") {
-      await loadCartForCurrentUser();
+      try {
+        console.log("Usuario customer logueado, cargando carrito existente...");
+        
+        const { loadCartForCurrentUser } = await import('./cart-sync');
+        
+        await loadCartForCurrentUser();
+        
+        console.log("Carrito del customer cargado exitosamente");
+      } catch (error) {
+        console.error("Error al cargar carrito del customer:", error);
+      }
     }
 
     return user;
@@ -179,7 +191,14 @@ export const RegisterAPI = {
   registerCustomer: async (data: any) => {
     const user = await customerAPI.create({ ...data });
     const userWithRole = { ...(typeof user === 'object' && user !== null ? user : {}), role: "customer" };
+    
+    sessionStorage.removeItem("shoppingCartId");
+    sessionStorage.removeItem("cart");
+
     sessionStorage.setItem("user", JSON.stringify(userWithRole));
+    
+    console.log("Nuevo customer registrado, carrito se creará cuando sea necesario");
+    
     return userWithRole;
   },
 };
