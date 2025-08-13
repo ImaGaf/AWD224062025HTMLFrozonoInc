@@ -1,5 +1,6 @@
 require("dotenv").config();
 const express = require("express");
+const basicAuth = require('./middlewares/basicAuth');
 const connectDB = require("./config/db");
 const cors = require('cors');
 
@@ -17,6 +18,8 @@ connectDB();
 
 app.use(cors(corsOptions));         
 app.use(express.json());
+
+app.use(basicAuth);
 
 app.use("/barroco/administrators", require("./routes/administratorRoutes"));
 app.use("/barroco/employees", require("./routes/employeeRoutes"));
