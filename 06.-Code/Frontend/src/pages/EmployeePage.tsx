@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { employeeAPI } from "@/lib/api";
+import { Link } from "react-router-dom";
 
 export default function EmployeePage() {
   const { toast } = useToast();
@@ -114,6 +115,7 @@ export default function EmployeePage() {
   };
 
   return (
+    
     <div className="min-h-screen bg-gradient-to-br from-cornsilk via-warm to-accent p-6">
       <Card className="max-w-2xl mx-auto bg-card/95 backdrop-blur">
         <CardHeader>
@@ -173,6 +175,22 @@ export default function EmployeePage() {
               {loading ? "Creando..." : "Crear Empleado"}
             </Button>
           </form>*/}
+          {/* Sidebar fijo */}
+                <div className="w-60 bg-gray-800 text-white flex flex-col p-4">
+                  <h2 className="text-lg font-bold mb-6">Menú</h2>
+                  <Link to="/clientes" className="mb-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded">
+                    Clientes
+                  </Link>
+                  <Link to="/dashboard" className="mb-2 bg-green-500 hover:bg-green-600 px-4 py-2 rounded">
+                    Dashboard
+                  </Link>
+                  <Link to="/productoscontrol" className="mb-2 bg-yellow-500 hover:bg-yellow-600 px-4 py-2 rounded">
+                    Productos
+                  </Link>
+                  <Link to="/ordenpedidos" className="mb-2 bg-purple-500 hover:bg-purple-600 px-4 py-2 rounded">
+                    Ordenes
+                  </Link>
+                </div>
 
           {/* Buscador por ID */}
           <form onSubmit={handleSearch} className="space-y-4 mb-6">

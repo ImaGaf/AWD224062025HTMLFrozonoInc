@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { orderAPI } from "@/lib/api"; // Asegúrate de que tenga getAll incluido
+import { Link } from "react-router-dom";
 
 export default function OrdersPage() {
   const { toast } = useToast();
@@ -105,6 +106,23 @@ export default function OrdersPage() {
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
+
+          {/* Sidebar fijo */}
+                <div className="w-60 bg-gray-800 text-white flex flex-col p-4">
+                  <h2 className="text-lg font-bold mb-6">Menú</h2>
+                  <Link to="/clientes" className="mb-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded">
+                    Clientes
+                  </Link>
+                  <Link to="/empleados" className="mb-2 bg-green-500 hover:bg-green-600 px-4 py-2 rounded">
+                    Empleados
+                  </Link>
+                  <Link to="/productoscontrol" className="mb-2 bg-yellow-500 hover:bg-yellow-600 px-4 py-2 rounded">
+                    Productos
+                  </Link>
+                  <Link to="/dashboard" className="mb-2 bg-purple-500 hover:bg-purple-600 px-4 py-2 rounded">
+                    Dashboard
+                  </Link>
+                </div>
 
           {/* Lista de órdenes */}
           {filteredOrders.length > 0 ? (

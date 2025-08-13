@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { productAPI, statsAPI } from "@/lib/api";
+import { Link } from "react-router-dom";
 
 export default function ProductPage() {
   const { toast } = useToast();
@@ -148,6 +149,7 @@ export default function ProductPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-cornsilk via-warm to-accent p-6">
+      
       <Card className="max-w-4xl mx-auto bg-card/95 backdrop-blur">
         <CardHeader>
           <CardTitle className="text-2xl font-bold">Gestión de Productos</CardTitle>
@@ -182,6 +184,23 @@ export default function ProductPage() {
             <Button onClick={fetchProducts} className="bg-ceramics">Todos</Button>
             <Button onClick={getLowStockProducts} className="bg-red-500">Sin Stock</Button>
           </div>
+
+          {/* Sidebar fijo */}
+                <div className="w-60 bg-gray-800 text-white flex flex-col p-4">
+                  <h2 className="text-lg font-bold mb-6">Menú</h2>
+                  <Link to="/clientes" className="mb-2 bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded">
+                    Clientes
+                  </Link>
+                  <Link to="/empleados" className="mb-2 bg-green-500 hover:bg-green-600 px-4 py-2 rounded">
+                    Empleados
+                  </Link>
+                  <Link to="/dashboard" className="mb-2 bg-yellow-500 hover:bg-yellow-600 px-4 py-2 rounded">
+                    Dashboard
+                  </Link>
+                  <Link to="/ordenpedidos" className="mb-2 bg-purple-500 hover:bg-purple-600 px-4 py-2 rounded">
+                    Ordenes
+                  </Link>
+                </div>
 
           <Separator />
 
