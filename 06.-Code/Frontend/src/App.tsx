@@ -21,7 +21,7 @@ import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCanceled from "./pages/PaymentCanceled";
 import Dashboard from "./pages/DashboardPage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import AdminPanel2 from "./pages/AdminPanel2";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -47,7 +47,7 @@ const App = () => (
             <Route path="/empleados" element={<ProtectedRoute role="employee"><EmployeePage /></ProtectedRoute>} />
             <Route path="/productoscontrol" element={<ProtectedRoute role="employee"><ProductPage /></ProtectedRoute>} />
             <Route path="/ordenpedidos" element={<ProtectedRoute role="employee"><OrdersPage /></ProtectedRoute>} />
-            <Route path="/admin" element={<ProtectedRoute role="admin"><AdminPanel2/></ProtectedRoute>} />
+            <Route path="/admin" element={<ProtectedRoute role="admin"><AdminPanel/></ProtectedRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute role="employee"><Dashboard /></ProtectedRoute>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
