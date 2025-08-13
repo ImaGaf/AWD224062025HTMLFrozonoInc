@@ -21,3 +21,7 @@ exports.updateShoppingCart = async (id, data) => {
 exports.deleteShoppingCart = async (id) => {
   return await ShoppingCart.findOneAndDelete({ idShoppingCart: id });
 };
+
+exports.getShoppingCartByCustomer = async (customerId) => {
+  return await ShoppingCart.findOne({ customer: customerId });
+};
